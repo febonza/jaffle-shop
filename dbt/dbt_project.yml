@@ -1,0 +1,75 @@
+name: "jaffle"
+version: "0.1.0"
+config-version: 2
+
+profile: "jaffle"
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  jaffle:
+    staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
+      +materialized: ephemeral
+    marts:
+      +schema: analytics
+      +materialized: table
+      core:
+        +tags: ["core"]
+      finance:
+        +tags: ["finance"]
+      customer:
+        +tags: ["customer"]
+
+seeds:
+  jaffle:
+    +schema: analytics
+    dim_date:
+      +column_types:
+        date_day: date
+        first_day_of_month: date
+        date_key: integer
+        year: integer
+        quarter: integer
+        month: integer
+        day_of_month: integer
+        day_of_year: integer
+        day_of_week: integer
+        iso_year: integer
+        iso_week: integer
+        iso_weekday: integer
+        week_of_year: integer
+        is_weekend: boolean
+        is_us_holiday: boolean
+        fiscal_year: integer
+        fiscal_quarter: integer
+        days_since_epoch: integer
+    sku_supplies_bom:
+      +schema: intermediate
+
+snapshots:
+  jaffle:
+    +target_schema: snapshots
+    +strategy: check
+
+vars:
+  # The first day of generated data — used for dim_date filters and `is_incremental` lookback.
+  data_start_date: "2022-01-01"
+  # Default lookback window for the dashboard (90d).
+  default_window_days: 90
+
+on-run-start:
+  - "{{ create_schemas_if_not_exists(['raw', 'staging', 'intermediate', 'analytics', 'snapshots', 'elementary']) }}"

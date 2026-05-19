@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" fill="none">
+  
+  <rect width="480" height="360" fill="#F5F1EA"></rect>
+  
+  <g transform="translate(24,24)">
+    <rect width="200" height="108" fill="#EDE7DD" stroke="#2A2A2A" stroke-width="1"></rect>
+    <text x="16" y="30" font-family="Inter,sans-serif" font-size="10" font-weight="600" letter-spacing="1.6" fill="#55534E">NET REVENUE · Q3</text>
+    <text x="16" y="70" font-family="JetBrains Mono,monospace" font-size="32" font-weight="500" fill="#111">$2.41M</text>
+    <text x="16" y="92" font-family="JetBrains Mono,monospace" font-size="12" fill="#C8632C">↑ 14.2% vs Q2</text>
+  </g>
+  
+  <g transform="translate(240,24)">
+    <rect width="216" height="108" fill="#EDE7DD" stroke="#2A2A2A" stroke-width="1"></rect>
+    <text x="16" y="30" font-family="Inter,sans-serif" font-size="10" font-weight="600" letter-spacing="1.6" fill="#55534E">WEEKLY GMV</text>
+    <g stroke="#2A2A2A" stroke-width="0.4" opacity="0.25">
+      <line x1="16" y1="50" x2="200" y2="50"></line>
+      <line x1="16" y1="75" x2="200" y2="75"></line>
+    </g>
+    <path d="M16,88 L40,80 L64,83 L88,72 L112,66 L136,70 L160,58 L184,48 L200,42" stroke="#111" stroke-width="1.5" fill="none"></path>
+    <circle cx="200" cy="42" r="3" fill="#C8632C"></circle>
+  </g>
+  
+  <g transform="translate(24,148)">
+    <rect width="200" height="108" fill="#EDE7DD" stroke="#2A2A2A" stroke-width="1"></rect>
+    <text x="16" y="30" font-family="Inter,sans-serif" font-size="10" font-weight="600" letter-spacing="1.6" fill="#55534E">TOP 6 SKU · UNITS</text>
+    <g fill="#111">
+      <rect x="16" y="50" width="22" height="44"></rect>
+      <rect x="46" y="58" width="22" height="36"></rect>
+      <rect x="76" y="64" width="22" height="30"></rect>
+      <rect x="106" y="72" width="22" height="22"></rect>
+      <rect x="136" y="78" width="22" height="16"></rect>
+    </g>
+    <rect x="166" y="82" width="22" height="12" fill="#C8632C"></rect>
+  </g>
+  
+  <g transform="translate(240,148)">
+    <rect width="216" height="108" fill="#EDE7DD" stroke="#2A2A2A" stroke-width="1"></rect>
+    <text x="16" y="30" font-family="Inter,sans-serif" font-size="10" font-weight="600" letter-spacing="1.6" fill="#55534E">STORE · MARGIN %</text>
+    <g font-family="JetBrains Mono,monospace" font-size="11" fill="#111">
+      <text x="16" y="54">Atlanta</text><text x="180" y="54" text-anchor="end" fill="#3C6E47">38.2</text>
+      <text x="16" y="72">Miami</text><text x="180" y="72" text-anchor="end" fill="#3C6E47">34.0</text>
+      <text x="16" y="90">Dallas</text><text x="180" y="90" text-anchor="end" fill="#B23A2E">22.1</text>
+    </g>
+  </g>
+  
+  <g transform="translate(24,272)">
+    <rect width="432" height="64" fill="#EDE7DD" stroke="#2A2A2A" stroke-width="1"></rect>
+    <text x="16" y="26" font-family="Inter,sans-serif" font-size="10" font-weight="600" letter-spacing="1.6" fill="#55534E">FORECAST · NEXT 13 WEEKS</text>
+    <path d="M16,52 L56,48 L96,50 L136,44 L176,40 L216,36 L256,38 L296,30 L336,28 L376,22 L416,18" stroke="#C8632C" stroke-width="1.5" fill="none"></path>
+    <circle cx="416" cy="18" r="3" fill="#C8632C"></circle>
+  </g>
+</svg>

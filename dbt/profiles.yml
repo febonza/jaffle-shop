@@ -1,0 +1,22 @@
+# dbt profiles for the jaffle project. DuckDB lives in a single file under data/.
+# This file is checked in because there are no secrets — the DB is local.
+jaffle:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('JAFFLE_DUCKDB_PATH', '../data/jaffle.duckdb') }}"
+      schema: analytics
+      threads: 4
+      extensions:
+        - httpfs
+    ci:
+      type: duckdb
+      path: ":memory:"
+      schema: analytics
+      threads: 4
+    prod:
+      type: duckdb
+      path: "{{ env_var('JAFFLE_DUCKDB_PATH', '/var/lib/jaffle/jaffle.duckdb') }}"
+      schema: analytics
+      threads: 4

@@ -1,0 +1,197 @@
+/* Brand tokens — pulled directly from the design system. */
+@import "../../../design/colors_and_type.css";
+
+* {
+  box-sizing: border-box;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Layout primitives — hairline grid, generous gutters. */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 var(--s-7);
+}
+
+@media (max-width: 720px) {
+  .container {
+    padding: 0 var(--s-5);
+  }
+}
+
+.section {
+  padding-block: var(--s-9);
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.section:last-of-type {
+  border-bottom: none;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-6);
+  margin-bottom: var(--s-6);
+}
+
+/* Numbers — JetBrains Mono, tabular. */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+/* Stat block — see design/preview/components-stats.html for the pattern. */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0;
+  border-top: 1px solid var(--border-strong);
+}
+
+.stat {
+  padding: var(--s-6) var(--s-5);
+  border-right: 1px solid var(--rule-soft);
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.stat:last-child {
+  border-right: none;
+}
+
+.stat-label {
+  font-family: var(--font-sans);
+  font-size: var(--fs-eyebrow);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: var(--s-3);
+}
+
+.stat-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 32px;
+  color: var(--fg);
+  line-height: 1;
+}
+
+.stat-sublabel {
+  font-size: var(--fs-xs);
+  color: var(--fg-faint);
+  margin-top: var(--s-3);
+}
+
+/* Eyebrow utility */
+.eyebrow {
+  display: inline-block;
+  margin-bottom: var(--s-3);
+}
+
+/* Nav */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s-5) 0;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.nav-brand {
+  font-family: var(--font-serif);
+  font-size: var(--fs-h4);
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: var(--s-6);
+}
+
+.nav-links a {
+  font-size: var(--fs-sm);
+  text-decoration: none;
+  color: var(--fg-muted);
+  transition: color var(--dur) var(--ease);
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--fg);
+}
+
+/* Footer */
+.footer {
+  padding: var(--s-7) 0;
+  font-size: var(--fs-sm);
+  color: var(--fg-muted);
+  border-top: 1px solid var(--border-strong);
+  margin-top: auto;
+}
+
+/* Chart frame */
+.chart-frame {
+  border: 1px solid var(--rule-soft);
+  border-top: 1px solid var(--border-strong);
+  padding: var(--s-6);
+}
+
+/* Table — for top-products and stores grid */
+.ruled-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+}
+
+.ruled-table th,
+.ruled-table td {
+  text-align: left;
+  padding: var(--s-3) var(--s-4);
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.ruled-table th {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  border-top: 1px solid var(--border-strong);
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.ruled-table td.num {
+  text-align: right;
+}
+
+/* Placeholder page */
+.placeholder {
+  padding: var(--s-9) 0;
+  text-align: center;
+  color: var(--fg-muted);
+}
+
+.placeholder-eyebrow {
+  margin-bottom: var(--s-4);
+}
+
+.placeholder h1 {
+  margin-bottom: var(--s-5);
+}
+
+/* Loading + error */
+.muted {
+  color: var(--fg-muted);
+  font-size: var(--fs-sm);
+}

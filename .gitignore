@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.python-version
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# uv
+.uv-cache/
+
+# Node
+node_modules/
+web/dist/
+*.tsbuildinfo
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+dbt/.user.yml
+
+# Dagster
+.dagster/
+dagster_home/
+tmp/
+
+# Data — never commit raw CSVs or DuckDB
+data/jafgen_output/
+data/*.duckdb
+data/*.duckdb.wal
+data/*.parquet
+
+# Elementary
+edr_target/
+
+# Web build outputs
+web/public/elementary/
+web/public/data-model.html
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/settings.json.example
+*.swp
+*~
+
+# Claude Code local session data
+.claude/
+
+# Secrets
+.env
+.env.local
+.env.*.local
+profiles.yml.local
+
+# Logs
+*.log

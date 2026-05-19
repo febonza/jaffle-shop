@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" fill="none">
+  
+  <g transform="translate(4, 12)">
+    <path d="M0 0 L0 40 L44 40" stroke="#111111" stroke-width="1.5" stroke-linecap="square"></path>
+    <circle cx="10" cy="30" r="2.5" fill="#111111"></circle>
+    <circle cx="22" cy="20" r="2.5" fill="#111111"></circle>
+    <circle cx="34" cy="8" r="2.5" fill="#C8632C"></circle>
+    <path d="M10 30 L22 20 L34 8" stroke="#111111" stroke-width="1" stroke-linecap="round"></path>
+  </g>
+  
+  <text x="64" y="42" font-family="Fraunces, &#39;Times New Roman&#39;, Georgia, serif" font-size="30" font-weight="400" letter-spacing="-0.03em" fill="#111111">bonzanini<tspan fill="#C8632C">.</tspan><tspan font-family="&#39;JetBrains Mono&#39;, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="500" fill="#55534E" dy="-4">works</tspan></text>
+</svg>

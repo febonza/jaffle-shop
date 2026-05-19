@@ -1,0 +1,20 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Primary colors</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; padding:20px; background:var(--paper); }
+  .row { display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; }
+  .sw { border:1px solid var(--rule-soft); }
+  .chip { height:76px; }
+  .meta { padding:8px 10px 10px; border-top:1px solid var(--rule-soft); }
+  .name { font: 600 12px/1.2 var(--font-sans); color:var(--ink); letter-spacing:.02em; }
+  .hex  { font: 500 11px/1.4 var(--font-mono); color:var(--ink-3); margin-top:2px; }
+</style></head>
+<body>
+  <div class="row">
+    <div class="sw"><div class="chip" style="background:#F5F1EA"></div><div class="meta"><div class="name">Paper</div><div class="hex">#F5F1EA · --paper</div></div></div>
+    <div class="sw"><div class="chip" style="background:#111111"></div><div class="meta"><div class="name" style="color:#111">Ink</div><div class="hex">#111111 · --ink</div></div></div>
+    <div class="sw"><div class="chip" style="background:#C8632C"></div><div class="meta"><div class="name">Accent</div><div class="hex">#C8632C · --accent</div></div></div>
+    <div class="sw"><div class="chip" style="background:#161513"></div><div class="meta"><div class="name">Ink BG</div><div class="hex">#161513 · --ink-bg</div></div></div>
+  </div>
+</body></html>

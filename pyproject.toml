@@ -1,0 +1,57 @@
+[project]
+name = "jaffle-shop-portfolio"
+version = "0.1.0"
+description = "End-to-end analytics portfolio on synthetic Jaffle Shop data — Dagster + dbt + DuckDB + Elementary + FastAPI + React."
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+authors = [{ name = "Felipe Bonzanini", email = "febonza@gmail.com" }]
+dependencies = [
+    "jafgen==0.4.14",
+    "dagster>=1.8.0",
+    "dagster-dbt>=0.24.0",
+    "dagster-duckdb>=0.24.0",
+    "dbt-core>=1.8.0",
+    "dbt-duckdb>=1.8.0",
+    "duckdb>=1.0.0",
+    "elementary-data[duckdb]>=0.16.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "pandas>=2.2.0",
+    "pydantic>=2.8.0",
+    "python-dateutil>=2.9.0",
+    "holidays>=0.56",
+]
+
+[project.optional-dependencies]
+dev = [
+    "dagster-webserver>=1.8.0",
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.6.0",
+    "sqlfluff>=3.1.0",
+    "sqlfluff-templater-dbt>=3.1.0",
+    "pre-commit>=3.8.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["pipeline/jaffle_pipeline", "api/jaffle_api"]
+
+[tool.dagster]
+module_name = "jaffle_pipeline.definitions"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = ["dbt/target", "dbt/dbt_packages", "data", "web", "design"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["pipeline/tests", "api/tests"]
+pythonpath = ["pipeline", "api"]

@@ -1,0 +1,31 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Service card</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; padding:20px 24px; background:var(--paper); }
+  .grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; border-top:1px solid #111; }
+  .card { border-bottom:1px solid #111; border-right:1px solid var(--rule-soft); padding:18px 18px 22px; }
+  .card:last-child { border-right:0; }
+  .num { font: 500 11px/1 var(--font-mono); color:#8A8578; }
+  .title { font-family:var(--font-serif); font-size:26px; line-height:1.05; color:#111; margin:12px 0 6px; letter-spacing:-0.02em; font-weight:400; }
+  .desc { font: 400 13px/1.5 var(--font-sans); color:#2A2A2A; margin:0; }
+</style></head>
+<body>
+  <div class="grid">
+    <div class="card">
+      <div class="num">01 / Service</div>
+      <div class="title">Diagnostic Week</div>
+      <p class="desc">Five days. One report. Actionable roadmap you own.</p>
+    </div>
+    <div class="card">
+      <div class="num">02 / Service</div>
+      <div class="title">Full Implementation</div>
+      <p class="desc">Rebuild your Looker from model to adoption.</p>
+    </div>
+    <div class="card">
+      <div class="num">03 / Service</div>
+      <div class="title">Advisory</div>
+      <p class="desc">Fractional leadership. On call, in your data.</p>
+    </div>
+  </div>
+</body></html>

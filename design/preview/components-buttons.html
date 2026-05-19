@@ -1,0 +1,25 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Buttons</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin:0; padding:24px; background:var(--paper); }
+  .row { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+  .btn { font: 600 14px/1 var(--font-sans); letter-spacing:.01em; padding:14px 22px; border:1px solid transparent; cursor:pointer; transition:all .2s cubic-bezier(.2,.6,.2,1); border-radius:2px; display:inline-flex; align-items:center; gap:8px; }
+  .btn-primary { background:#111; color:#F5F1EA; }
+  .btn-primary:hover { background:#C8632C; }
+  .btn-accent { background:#C8632C; color:#F5F1EA; }
+  .btn-accent:hover { background:#9E4B1E; }
+  .btn-ghost { background:transparent; color:#111; border-color:#111; }
+  .btn-ghost:hover { background:#111; color:#F5F1EA; }
+  .btn-link { background:transparent; padding:4px 0; color:#111; border:0; border-bottom:1px solid #111; border-radius:0; }
+  .btn-link:hover { color:#9E4B1E; border-color:#9E4B1E; }
+  .arr { display:inline-block; transform:translateY(-1px); }
+</style></head>
+<body>
+  <div class="row">
+    <button class="btn btn-primary">Book a call <span class="arr">→</span></button>
+    <button class="btn btn-accent">Start diagnostic week</button>
+    <button class="btn btn-ghost">See services</button>
+    <button class="btn btn-link">Read the approach →</button>
+  </div>
+</body></html>

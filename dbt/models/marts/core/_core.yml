@@ -1,0 +1,174 @@
+version: 2
+
+models:
+  - name: fct_orders
+    description: |
+      **Grain:** one row per completed order.
+      **Source:** built incrementally from int_orders__enriched on `ordered_at`.
+      **Used by:** the FastAPI `/api/overview/kpis` and `/api/overview/revenue-series` endpoints; LTV/churn marts downstream.
+    columns:
+      - name: order_id
+        description: |
+          **Grain:** per order.
+          **Represents:** the jafgen-issued UUID of the order.
+          **Used by:** every downstream join touching orders.
+          **Business rules:** unique, never null.
+          **AI workflow context:** prefer this over `(customer_id, ordered_at)` for joins — that pair is not guaranteed unique.
+        data_tests: [unique, not_null]
+
+      - name: ordered_at
+        description: |
+          **Grain:** per order.
+          **Represents:** timestamp (UTC, jafgen-naive) the order was placed.
+          **Business rules:** drives the incremental watermark; downstream date filters should use `ordered_date` for partitioning, `ordered_at` for ordering.
+        data_tests: [not_null]
+
+      - name: ordered_date
+        description: |
+          **Grain:** per order.
+          **Represents:** date-only projection of `ordered_at`, used as the partition key and the join into `dim_dates`.
+          **AI workflow context:** when building daily revenue, group by this — not `ordered_at::date` — for clarity.
+        data_tests: [not_null]
+
+      - name: date_key
+        description: |
+          **Grain:** per order.
+          **Represents:** integer date key in `YYYYMMDD` form (the same format used by `dim_date.date_key`).
+          **Used by:** star-schema joins to `dim_dates`.
+
+      - name: customer_key
+        description: |
+          **Grain:** per order.
+          **Represents:** surrogate key into the current row of `dim_customers`.
+          **Business rules:** points to the customer's state as of *order time*; for snapshots of historic customer state, use `dim_customers.customer_key` with `valid_from` ≤ `ordered_at` ≤ `valid_to`.
+          **Excludes:** orders from customers absent from `dim_customers` are kept with a null `customer_key` (no inner join) so revenue totals don't silently drop rows. Investigate any null customer_key during QA.
+
+      - name: store_key
+        description: Surrogate key into `dim_stores`. Used by the store-performance grid on Overview.
+
+      - name: subtotal_usd
+        description: |
+          **Grain:** per order.
+          **Represents:** pre-tax order subtotal, in USD.
+          **Business rules:** equals sum of line-item gross revenue *minus* any order-level promotions (jafgen does not currently emit promos, so today subtotal = sum of line items).
+          **Excludes:** tax; tips; refunds (jafgen has none).
+
+      - name: tax_usd
+        description: |
+          **Grain:** per order.
+          **Represents:** tax amount paid, in USD, computed by jafgen using the store's `tax_rate`.
+
+      - name: order_total_usd
+        description: |
+          **Grain:** per order.
+          **Represents:** gross sale amount paid by the customer, in USD, *after* tax.
+          **Used by:** GMV KPIs, daily revenue series, LTV calc.
+          **Business rules:** equals `subtotal_usd + tax_usd`.
+          **Trade-offs:** refunds and returns are not modeled (jafgen does not produce them); this field overstates net revenue if you later layer a returns dataset. The doc block in `mart_daily_revenue` repeats this caveat.
+          **Excludes:** refunds; tips; cancellations.
+          **Includes:** all orders jafgen emits (jafgen does not emit cancellations).
+          **AI workflow context:** for headline revenue numbers prefer this over aggregations of `fct_order_items.gross_revenue_usd` (which sums to pre-tax).
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: false
+
+      - name: item_count
+        description: Number of line items on the order. Joined up from `fct_order_items`.
+
+  - name: fct_order_items
+    description: |
+      **Grain:** one row per (order, product).
+      **Used by:** product-revenue rollups, margin analysis.
+    columns:
+      - name: order_item_id
+        data_tests: [unique, not_null]
+      - name: order_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fct_orders')
+                field: order_id
+      - name: gross_revenue_usd
+        description: |
+          **Grain:** per line item.
+          **Represents:** list-price gross revenue (qty × list_price). Quantity is currently always 1 — jafgen's `raw_order_items` does not include a quantity column; if a future generator does, update the staging model and this doc block together.
+      - name: cogs_usd
+        description: |
+          **Grain:** per line item.
+          **Represents:** cost of goods sold, in USD. Pulled from `dim_products.unit_cost_usd`, which sums `stg_jaffle__supplies.supply_cost_usd` per SKU.
+          **Trade-offs:** jafgen does not emit a real BOM; the supplies→sku map is one-to-one and represents a synthetic cost only. Margin numbers are illustrative, not real.
+      - name: margin_usd
+        description: gross_revenue_usd − cogs_usd. Same illustrative-only caveat as `cogs_usd`.
+
+  - name: dim_customers
+    description: |
+      **Grain:** one row per customer per attribute version (SCD-2).
+      **Used by:** `fct_orders.customer_key`, churn/LTV marts.
+      **AI workflow context:** to count "current customers" filter `where is_current`; to count "customers as of date X" filter `where valid_from <= X and (valid_to is null or valid_to > X)`.
+    columns:
+      - name: customer_key
+        description: Surrogate key (`md5(customer_id || valid_from)`). Unique across the SCD-2 history.
+        data_tests: [unique, not_null]
+      - name: customer_id
+        description: Stable natural key from jafgen. Not unique in this table — repeats once per version.
+        data_tests: [not_null]
+      - name: customer_segment
+        description: |
+          **Represents:** computed segment in `{inactive, new, returning, vip}`.
+          **Business rules:** `vip` = lifetime_orders ≥ 20 OR lifetime_revenue_usd ≥ 500; `returning` = lifetime_orders ≥ 5; `new` = ≥ 1 order; `inactive` = 0 orders.
+          **AI workflow context:** segments transition over time as customers accumulate orders — that's *why* this dimension is SCD-2.
+        data_tests:
+          - accepted_values:
+              values: ["inactive", "new", "returning", "vip"]
+      - name: is_active
+        description: True if the customer has ordered within the last 90 days *as of the build time*.
+      - name: lifetime_orders
+      - name: lifetime_revenue_usd
+      - name: first_order_date
+      - name: last_order_date
+      - name: valid_from
+      - name: valid_to
+      - name: is_current
+
+  - name: dim_products
+    description: |
+      **Grain:** one row per SKU per attribute version (SCD-2).
+      **Used by:** `fct_order_items.product_key`, product-level revenue/margin rollups.
+    columns:
+      - name: product_key
+        data_tests: [unique, not_null]
+      - name: product_sku
+        data_tests: [not_null]
+      - name: product_name
+      - name: product_type
+      - name: list_price_usd
+      - name: unit_cost_usd
+        description: Sum of supply costs for this SKU. See `fct_order_items.cogs_usd` for caveats.
+      - name: gross_margin_pct
+        description: (list_price - unit_cost) / list_price. Null when cost is unknown.
+      - name: is_current
+
+  - name: dim_stores
+    description: |
+      **Grain:** one row per store (SCD-1 — store attributes treated as stable).
+    columns:
+      - name: store_key
+        data_tests: [unique, not_null]
+      - name: store_id
+        data_tests: [unique, not_null]
+      - name: store_name
+      - name: opened_at
+      - name: tax_rate
+
+  - name: dim_dates
+    description: |
+      Calendar dimension. Sourced from the `dim_date` seed (15-year range 2022 → 2036).
+      Exposed as a view so downstream models can `ref('dim_dates')` (consistent with the
+      `dim_*` naming) without seeding from the raw `dim_date` directly.
+    columns:
+      - name: date_day
+        data_tests: [unique, not_null]
+      - name: date_key
+        data_tests: [unique, not_null]

@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: int_orders__enriched
+    description: Orders enriched with per-order item counts from order_items.
+    columns:
+      - name: order_id
+        data_tests: [unique, not_null]
+      - name: customer_id
+        data_tests: [not_null]
+      - name: item_count
+        data_tests: [not_null]
+
+  - name: int_customers__lifetime_metrics
+    description: |
+      Per-customer aggregates from the full order history. Feeds snap_customers,
+      which versions the computed `customer_segment` over time, and dim_customers
+      downstream.
+    columns:
+      - name: customer_id
+        data_tests: [unique, not_null]
+      - name: customer_segment
+        data_tests:
+          - accepted_values:
+              values: ["inactive", "new", "returning", "vip"]
+      - name: lifetime_orders
+      - name: lifetime_revenue_usd

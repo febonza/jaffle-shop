@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: mart_daily_revenue
+    description: |
+      **Grain:** one row per calendar day in the order window.
+      **Represents:** daily GMV / orders / unique customers, gap-filled against `dim_dates`.
+      **Used by:** Overview revenue chart, daily-trend KPI deltas.
+      **Trade-offs:** see fct_orders.order_total_usd — refunds are excluded because the source lacks them.
+    columns:
+      - name: ordered_date
+        data_tests: [unique, not_null]
+      - name: orders
+      - name: gmv_usd
+      - name: unique_customers

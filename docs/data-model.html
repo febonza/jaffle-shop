@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Jaffle Shop — Data model</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../design/colors_and_type.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <style>
+    body { padding: 0; }
+    .container { max-width: 1200px; margin: 0 auto; padding: var(--s-9) var(--s-7); }
+    h1.display { margin-bottom: var(--s-5); }
+    .erd {
+      border: 1px solid var(--border-strong);
+      padding: var(--s-7);
+      margin: var(--s-7) 0;
+      background: var(--paper-2);
+      overflow-x: auto;
+    }
+    .erd svg { display: block; margin: 0 auto; }
+    .table-panel {
+      border-top: 1px solid var(--border-strong);
+      padding: var(--s-7) 0;
+    }
+    .table-panel header h2 { margin: var(--s-3) 0; }
+    .table-panel header h2 code { font-size: var(--fs-h3); }
+    .table-panel .lede { max-width: 720px; }
+    .cols { margin-top: var(--s-6); }
+    details.col {
+      border-bottom: 1px solid var(--rule-soft);
+      padding: var(--s-3) 0;
+    }
+    details.col summary {
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--s-4);
+      list-style: none;
+    }
+    details.col summary::-webkit-details-marker { display: none; }
+    details.col summary code {
+      font-size: var(--fs-body);
+      color: var(--fg);
+    }
+    .col-tests {
+      font-size: var(--fs-xs);
+      color: var(--fg-muted);
+      font-family: var(--font-mono);
+    }
+    .col-desc {
+      padding: var(--s-4) 0 var(--s-3);
+      color: var(--fg-2);
+      max-width: 760px;
+      line-height: 1.55;
+    }
+    .toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-3);
+      margin: var(--s-5) 0;
+    }
+    .toc a {
+      font-size: var(--fs-xs);
+      padding: var(--s-2) var(--s-3);
+      border: 1px solid var(--border-strong);
+      text-decoration: none;
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <div class="eyebrow">Data model</div>
+    <h1 class="display">Jaffle Shop — Kimball star.</h1>
+    <p class="lede" style="max-width: 720px;">
+      The marts layer is a classic dimensional model. Two facts (orders, order items) joined to four
+      dimensions (customers, products, stores, dates). Click any column for the doc block.
+    </p>
+
+    <div class="toc">
+      <a href="#dim_customers"><code>dim_customers</code></a>
+<a href="#dim_dates"><code>dim_dates</code></a>
+<a href="#dim_products"><code>dim_products</code></a>
+<a href="#dim_stores"><code>dim_stores</code></a>
+<a href="#fct_order_items"><code>fct_order_items</code></a>
+<a href="#fct_orders"><code>fct_orders</code></a>
+<a href="#mart_daily_revenue"><code>mart_daily_revenue</code></a>
+    </div>
+
+    <section class="erd">
+      <pre class="mermaid">erDiagram
+    dim_customers {
+        column customer_key
+        column customer_id
+        column customer_segment
+        column is_active
+        column lifetime_orders
+        column lifetime_revenue_usd
+        column first_order_date
+        column last_order_date
+        column _and_3_more
+    }
+    dim_products {
+        column product_key
+        column product_sku
+        column product_name
+        column product_type
+        column list_price_usd
+        column unit_cost_usd
+        column gross_margin_pct
+        column is_current
+    }
+    dim_stores {
+        column store_key
+        column store_id
+        column store_name
+        column opened_at
+        column tax_rate
+    }
+    fct_order_items {
+        column order_item_id
+        column order_id
+        column gross_revenue_usd
+        column cogs_usd
+        column margin_usd
+    }
+    fct_orders {
+        column order_id
+        column ordered_at
+        column ordered_date
+        column date_key
+        column customer_key
+        column store_key
+        column subtotal_usd
+        column tax_usd
+        column _and_2_more
+    }
+    dim_dates {
+        column date_day
+        column date_key
+    }
+    mart_daily_revenue {
+        column ordered_date
+        column orders
+        column gmv_usd
+        column unique_customers
+    }
+    fct_orders }o--|| dim_customers : "ordered by"
+    fct_orders }o--|| dim_stores : "placed at"
+    fct_orders }o--|| dim_dates : "on"
+    fct_order_items }o--|| fct_orders : "belongs to"
+    fct_order_items }o--|| dim_products : "for"
+    fct_order_items }o--|| dim_customers : "by"
+    fct_order_items }o--|| dim_stores : "at"
+    fct_order_items }o--|| dim_dates : "on"</pre>
+    </section>
+
+    
+    <article class="table-panel" id="dim_customers">
+      <header>
+        <div class="eyebrow">analytics</div>
+        <h2><code>dim_customers</code></h2>
+        <p class="lede">**Grain:** one row per customer per attribute version (SCD-2).<br>**Used by:** `fct_orders.customer_key`, churn/LTV marts.<br>**AI workflow context:** to count &quot;current customers&quot; filter `where is_current`; to count &quot;customers as of date X&quot; filter `where valid_from &lt;= X and (valid_to is null or valid_to &gt; X)`.</p>
+      </header>
+      <div class="cols">
+        
+    <details class="col">
+      <summary>
+        <code>customer_key</code>
+        
+      </summary>
+      <div class="col-desc">Surrogate key (`md5(customer_id || valid_from)`). Unique across the SCD-2 history.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>customer_id</code>
+        
+      </summary>
+      <div class="col-desc">Stable natural key from jafgen. Not unique in this table — repeats once per version.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>customer_segment</code>
+        
+      </summary>
+      <div class="col-desc">**Represents:** computed segment in `{inactive, new, returning, vip}`.<br>**Business rules:** `vip` = lifetime_orders ≥ 20 OR lifetime_revenue_usd ≥ 500; `returning` = lifetime_orders ≥ 5; `new` = ≥ 1 order; `inactive` = 0 orders.<br>**AI workflow context:** segments transition over time as customers accumulate orders — that&#x27;s *why* this dimension is SCD-2.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>is_active</code>
+        
+      </summary>
+      <div class="col-desc">True if the customer has ordered within the last 90 days *as of the build time*.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>lifetime_orders</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>lifetime_revenue_usd</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>first_order_date</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>last_order_date</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>valid_from</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>valid_to</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>is_current</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+      </div>
+    </article>
+    
+
+    <article class="table-panel" id="dim_dates">
+      <header>
+        <div class="eyebrow">analytics</div>
+        <h2><code>dim_dates</code></h2>
+        <p class="lede">Calendar dimension. Sourced from the `dim_date` seed (15-year range 2022 → 2036).<br>Exposed as a view so downstream models can `ref(&#x27;dim_dates&#x27;)` (consistent with the<br>`dim_*` naming) without seeding from the raw `dim_date` directly.</p>
+      </header>
+      <div class="cols">
+        
+    <details class="col">
+      <summary>
+        <code>date_day</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>date_key</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+      </div>
+    </article>
+    
+
+    <article class="table-panel" id="dim_products">
+      <header>
+        <div class="eyebrow">analytics</div>
+        <h2><code>dim_products</code></h2>
+        <p class="lede">**Grain:** one row per SKU per attribute version (SCD-2).<br>**Used by:** `fct_order_items.product_key`, product-level revenue/margin rollups.</p>
+      </header>
+      <div class="cols">
+        
+    <details class="col">
+      <summary>
+        <code>product_key</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>product_sku</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>product_name</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>product_type</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>list_price_usd</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>unit_cost_usd</code>
+        
+      </summary>
+      <div class="col-desc">Sum of supply costs for this SKU. See `fct_order_items.cogs_usd` for caveats.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>gross_margin_pct</code>
+        
+      </summary>
+      <div class="col-desc">(list_price - unit_cost) / list_price. Null when cost is unknown.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>is_current</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+      </div>
+    </article>
+    
+
+    <article class="table-panel" id="dim_stores">
+      <header>
+        <div class="eyebrow">analytics</div>
+        <h2><code>dim_stores</code></h2>
+        <p class="lede">**Grain:** one row per store (SCD-1 — store attributes treated as stable).</p>
+      </header>
+      <div class="cols">
+        
+    <details class="col">
+      <summary>
+        <code>store_key</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>store_id</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>store_name</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>opened_at</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>tax_rate</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+      </div>
+    </article>
+    
+
+    <article class="table-panel" id="fct_order_items">
+      <header>
+        <div class="eyebrow">analytics</div>
+        <h2><code>fct_order_items</code></h2>
+        <p class="lede">**Grain:** one row per (order, product).<br>**Used by:** product-revenue rollups, margin analysis.</p>
+      </header>
+      <div class="cols">
+        
+    <details class="col">
+      <summary>
+        <code>order_item_id</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>order_id</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>gross_revenue_usd</code>
+        
+      </summary>
+      <div class="col-desc">**Grain:** per line item.<br>**Represents:** list-price gross revenue (qty × list_price). Quantity is currently always 1 — jafgen&#x27;s `raw_order_items` does not include a quantity column; if a future generator does, update the staging model and this doc block together.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>cogs_usd</code>
+        
+      </summary>
+      <div class="col-desc">**Grain:** per line item.<br>**Represents:** cost of goods sold, in USD. Pulled from `dim_products.unit_cost_usd`, which sums `stg_jaffle__supplies.supply_cost_usd` per SKU.<br>**Trade-offs:** jafgen does not emit a real BOM; the supplies→sku map is one-to-one and represents a synthetic cost only. Margin numbers are illustrative, not real.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>margin_usd</code>
+        
+      </summary>
+      <div class="col-desc">gross_revenue_usd − cogs_usd. Same illustrative-only caveat as `cogs_usd`.</div>
+    </details>
+    
+      </div>
+    </article>
+    
+
+    <article class="table-panel" id="fct_orders">
+      <header>
+        <div class="eyebrow">analytics</div>
+        <h2><code>fct_orders</code></h2>
+        <p class="lede">**Grain:** one row per completed order.<br>**Source:** built incrementally from int_orders__enriched on `ordered_at`.<br>**Used by:** the FastAPI `/api/overview/kpis` and `/api/overview/revenue-series` endpoints; LTV/churn marts downstream.</p>
+      </header>
+      <div class="cols">
+        
+    <details class="col">
+      <summary>
+        <code>order_id</code>
+        
+      </summary>
+      <div class="col-desc">**Grain:** per order.<br>**Represents:** the jafgen-issued UUID of the order.<br>**Used by:** every downstream join touching orders.<br>**Business rules:** unique, never null.<br>**AI workflow context:** prefer this over `(customer_id, ordered_at)` for joins — that pair is not guaranteed unique.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>ordered_at</code>
+        
+      </summary>
+      <div class="col-desc">**Grain:** per order.<br>**Represents:** timestamp (UTC, jafgen-naive) the order was placed.<br>**Business rules:** drives the incremental watermark; downstream date filters should use `ordered_date` for partitioning, `ordered_at` for ordering.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>ordered_date</code>
+        
+      </summary>
+      <div class="col-desc">**Grain:** per order.<br>**Represents:** date-only projection of `ordered_at`, used as the partition key and the join into `dim_dates`.<br>**AI workflow context:** when building daily revenue, group by this — not `ordered_at::date` — for clarity.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>date_key</code>
+        
+      </summary>
+      <div class="col-desc">**Grain:** per order.<br>**Represents:** integer date key in `YYYYMMDD` form (the same format used by `dim_date.date_key`).<br>**Used by:** star-schema joins to `dim_dates`.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>customer_key</code>
+        
+      </summary>
+      <div class="col-desc">**Grain:** per order.<br>**Represents:** surrogate key into the current row of `dim_customers`.<br>**Business rules:** points to the customer&#x27;s state as of *order time*; for snapshots of historic customer state, use `dim_customers.customer_key` with `valid_from` ≤ `ordered_at` ≤ `valid_to`.<br>**Excludes:** orders from customers absent from `dim_customers` are kept with a null `customer_key` (no inner join) so revenue totals don&#x27;t silently drop rows. Investigate any null customer_key during QA.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>store_key</code>
+        
+      </summary>
+      <div class="col-desc">Surrogate key into `dim_stores`. Used by the store-performance grid on Overview.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>subtotal_usd</code>
+        
+      </summary>
+      <div class="col-desc">**Grain:** per order.<br>**Represents:** pre-tax order subtotal, in USD.<br>**Business rules:** equals sum of line-item gross revenue *minus* any order-level promotions (jafgen does not currently emit promos, so today subtotal = sum of line items).<br>**Excludes:** tax; tips; refunds (jafgen has none).</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>tax_usd</code>
+        
+      </summary>
+      <div class="col-desc">**Grain:** per order.<br>**Represents:** tax amount paid, in USD, computed by jafgen using the store&#x27;s `tax_rate`.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>order_total_usd</code>
+        
+      </summary>
+      <div class="col-desc">**Grain:** per order.<br>**Represents:** gross sale amount paid by the customer, in USD, *after* tax.<br>**Used by:** GMV KPIs, daily revenue series, LTV calc.<br>**Business rules:** equals `subtotal_usd + tax_usd`.<br>**Trade-offs:** refunds and returns are not modeled (jafgen does not produce them); this field overstates net revenue if you later layer a returns dataset. The doc block in `mart_daily_revenue` repeats this caveat.<br>**Excludes:** refunds; tips; cancellations.<br>**Includes:** all orders jafgen emits (jafgen does not emit cancellations).<br>**AI workflow context:** for headline revenue numbers prefer this over aggregations of `fct_order_items.gross_revenue_usd` (which sums to pre-tax).</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>item_count</code>
+        
+      </summary>
+      <div class="col-desc">Number of line items on the order. Joined up from `fct_order_items`.</div>
+    </details>
+    
+      </div>
+    </article>
+    
+
+    <article class="table-panel" id="mart_daily_revenue">
+      <header>
+        <div class="eyebrow">analytics</div>
+        <h2><code>mart_daily_revenue</code></h2>
+        <p class="lede">**Grain:** one row per calendar day in the order window.<br>**Represents:** daily GMV / orders / unique customers, gap-filled against `dim_dates`.<br>**Used by:** Overview revenue chart, daily-trend KPI deltas.<br>**Trade-offs:** see fct_orders.order_total_usd — refunds are excluded because the source lacks them.</p>
+      </header>
+      <div class="cols">
+        
+    <details class="col">
+      <summary>
+        <code>ordered_date</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>orders</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>gmv_usd</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+    <details class="col">
+      <summary>
+        <code>unique_customers</code>
+        
+      </summary>
+      <div class="col-desc muted">No description.</div>
+    </details>
+    
+      </div>
+    </article>
+    
+  </main>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#F5F1EA',
+        primaryTextColor: '#111111',
+        primaryBorderColor: '#111111',
+        lineColor: '#111111',
+        fontFamily: 'JetBrains Mono, monospace',
+      },
+    });
+  </script>
+</body>
+</html>

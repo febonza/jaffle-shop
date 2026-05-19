@@ -1,0 +1,109 @@
+version: 2
+
+sources:
+  - name: raw
+    description: |
+      Landing schema populated by the Dagster ingestion assets from CSVs in
+      data/jafgen_output/. Each table is partitioned by `ordered_at::date`
+      (orders, order_items) or loaded in full (dimensions). See the pipeline
+      package for the partitioning logic.
+    schema: raw
+    loaded_at_field: _loaded_at
+    tables:
+      - name: raw_customers
+        identifier: raw_customers
+        description: One row per customer as emitted by jafgen.
+        columns:
+          - name: id
+            description: Customer UUID. Primary key.
+            data_tests:
+              - unique
+              - not_null
+          - name: name
+            description: Customer display name.
+
+      - name: raw_orders
+        identifier: raw_orders
+        description: One row per order. The Dagster ingestion asset partitions by `ordered_at::date`.
+        columns:
+          - name: id
+            description: Order UUID. Primary key.
+            data_tests:
+              - unique
+              - not_null
+          - name: customer
+            description: FK to raw_customers.id.
+            data_tests:
+              - not_null
+          - name: ordered_at
+            description: ISO-8601 timestamp of when the order was placed.
+            data_tests:
+              - not_null
+          - name: store_id
+            description: FK to raw_stores.id.
+          - name: subtotal
+            description: Pre-tax order subtotal in cents (jafgen uses cents).
+          - name: tax_paid
+            description: Tax amount in cents.
+          - name: order_total
+            description: Subtotal + tax, in cents.
+
+      - name: raw_items
+        identifier: raw_items
+        description: One row per (order, product). Joined to raw_orders by order_id. Note the jafgen CSV is named raw_items.csv.
+        columns:
+          - name: id
+            data_tests:
+              - unique
+              - not_null
+          - name: order_id
+            description: FK to raw_orders.id.
+            data_tests:
+              - not_null
+          - name: sku
+            description: FK to raw_products.sku.
+            data_tests:
+              - not_null
+
+      - name: raw_products
+        identifier: raw_products
+        description: Product catalog.
+        columns:
+          - name: sku
+            description: Product SKU. Primary key.
+            data_tests:
+              - unique
+              - not_null
+          - name: name
+          - name: type
+            description: Product category (e.g., jaffle, beverage).
+          - name: price
+            description: List price in cents.
+          - name: description
+
+      - name: raw_stores
+        identifier: raw_stores
+        description: Store locations.
+        columns:
+          - name: id
+            data_tests:
+              - unique
+              - not_null
+          - name: name
+          - name: opened_at
+            description: ISO-8601 timestamp the store opened.
+          - name: tax_rate
+
+      - name: raw_supplies
+        identifier: raw_supplies
+        description: Supplies (ingredients) consumed by SKUs. Joined to products for cost analysis.
+        columns:
+          - name: id
+            data_tests:
+              - not_null
+          - name: name
+          - name: cost
+            description: Cost per unit in cents.
+          - name: perishable
+          - name: sku
+            description: FK to raw_products.sku (one supply can map to one SKU's BOM).

@@ -1,0 +1,86 @@
+version: 2
+
+models:
+  - name: stg_jaffle__customers
+    description: Cleaned customers. 1:1 with raw_customers; just renaming and trimming.
+    columns:
+      - name: customer_id
+        data_tests: [unique, not_null]
+      - name: customer_name
+
+  - name: stg_jaffle__orders
+    description: |
+      Cleaned orders, with monetary fields converted from cents (raw) to USD decimals.
+      `ordered_date` is the partition key used downstream and by the API.
+    columns:
+      - name: order_id
+        data_tests: [unique, not_null]
+      - name: customer_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_jaffle__customers')
+                field: customer_id
+      - name: store_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_jaffle__stores')
+                field: store_id
+      - name: ordered_at
+        data_tests: [not_null]
+      - name: ordered_date
+        data_tests: [not_null]
+      - name: subtotal_usd
+      - name: tax_usd
+      - name: order_total_usd
+
+  - name: stg_jaffle__order_items
+    description: Cleaned order items (source table raw_items). Grain = (order_id, product_sku).
+    columns:
+      - name: order_item_id
+        data_tests: [unique, not_null]
+      - name: order_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_jaffle__orders')
+                field: order_id
+      - name: product_sku
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_jaffle__products')
+                field: product_sku
+
+  - name: stg_jaffle__products
+    columns:
+      - name: product_sku
+        data_tests: [unique, not_null]
+      - name: product_name
+      - name: product_type
+      - name: list_price_usd
+
+  - name: stg_jaffle__stores
+    columns:
+      - name: store_id
+        data_tests: [unique, not_null]
+      - name: store_name
+      - name: opened_at
+      - name: tax_rate
+
+  - name: stg_jaffle__supplies
+    columns:
+      - name: supply_id
+        data_tests: [not_null]
+      - name: product_sku
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_jaffle__products')
+                field: product_sku
+      - name: supply_cost_usd
+      - name: is_perishable
