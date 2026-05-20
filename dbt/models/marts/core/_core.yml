@@ -162,6 +162,46 @@ models:
       - name: opened_at
       - name: tax_rate
 
+  - name: mart_product_revenue_daily
+    description: |
+      **Grain:** one row per (ordered_date, store_key, product_key).
+      **Represents:** daily product-level revenue and unit counts broken out by store.
+      **Used by:** `/api/app/categories` (product-type rollup) and `/api/app/products` (top-products list).
+      **Business rules:** ordered_date from fct_order_items. Product attributes (name, type) are denormalised from the current dim_products row at build time.
+      **Trade-offs:** product attributes are SCD-2; this mart snapshots the current version. Historic renames/reprices are not carried. Margins use synthetic BOM costs — see fct_order_items.cogs_usd.
+      **Excludes:** items where product_key is null (should be none; would indicate a SKU missing from dim_products).
+      **AI workflow context:** to get category-level revenue, group by product_type and sum gross_revenue_usd. To filter to a store subset, filter on store_key or store_id. Do not use this mart for order-level AOV — use fct_orders.order_total_usd.
+    columns:
+      - name: ordered_date
+        description: Calendar date the item was ordered.
+        data_tests: [not_null]
+      - name: store_key
+        description: Surrogate key into dim_stores. Combined with ordered_date and product_key forms the composite primary key.
+        data_tests: [not_null]
+      - name: store_id
+        description: Natural key of the store. Denormalised for convenience.
+      - name: store_name
+        description: Human-readable store name. Denormalised for convenience.
+      - name: product_key
+        description: Surrogate key into dim_products (current row only).
+        data_tests: [not_null]
+      - name: product_name
+        description: Product display name. Denormalised from dim_products.
+      - name: product_type
+        description: |
+          **Represents:** product category. Values in the current dataset: `jaffle`, `beverage`.
+          **Business rules:** used as the category grouping on the app dashboard. If jafgen adds more types, the chart expands automatically.
+      - name: units
+        description: Count of line items (quantity = 1 per line in jafgen) for this product at this store on this date.
+      - name: gross_revenue_usd
+        description: |
+          **Represents:** list-price revenue for this product, store, and date. Equivalent to units × list_price_usd.
+          **Excludes:** tax.
+      - name: cogs_usd
+        description: Synthetic cost of goods for this product, store, and date. Illustrative only — see fct_order_items.cogs_usd.
+      - name: margin_usd
+        description: gross_revenue_usd − cogs_usd. Illustrative only.
+
   - name: dim_dates
     description: |
       Calendar dimension. Sourced from the `dim_date` seed (15-year range 2022 → 2036).

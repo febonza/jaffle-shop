@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Churn · Jaffle Shop Analytics</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<link rel="stylesheet" href="styles/tokens.css" />
+<link rel="stylesheet" href="styles/site.css" />
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="brand" href="index.html">
+    <svg class="mark" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+      <g transform="translate(10, 10)">
+        <path d="M0 0 L0 44 L44 44" stroke="#111111" stroke-width="2" stroke-linecap="square"></path>
+        <circle cx="10" cy="34" r="3" fill="#111111"></circle>
+        <circle cx="24" cy="22" r="3" fill="#111111"></circle>
+        <circle cx="38" cy="8" r="3.5" fill="#C8632C"></circle>
+        <path d="M10 34 L24 22 L38 8" stroke="#111111" stroke-width="1.5" stroke-linecap="round"></path>
+      </g>
+    </svg>
+    <div>
+      <div class="wordmark">Jaffle Shop Analytics</div>
+      <div class="tag">BONZANINI CONSULTING · PORTFOLIO</div>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="index.html">Overview</a>
+    <a href="app.html">Dashboard</a>
+    <a href="ltv.html">LTV<span class="stub">·wip</span></a>
+    <a href="churn.html" class="active">Churn<span class="stub">·wip</span></a>
+    <a href="data-quality.html">Data quality<span class="stub">·wip</span></a>
+  </div>
+  <div class="env">
+    <span class="dot"></span>
+    <span>duckdb · prod</span>
+    <span style="color: var(--ink-4)">·</span>
+    <span>v0.4.2</span>
+  </div>
+</nav>
+
+<div class="stub-page">
+  <div class="stub-card">
+    <div class="badge">Placeholder · WIP</div>
+    <div class="eyebrow-num">
+      <span class="idx">04</span>
+      <span>Customer churn</span>
+    </div>
+    <h1>Churn</h1>
+    <p style="font-family: var(--font-sans); font-size: 19px; color: var(--ink-2); margin-bottom: 22px;">Who is walking away — and what they did before they did.</p>
+    <p>Stubbed. I have the lapsed-customer logic running in dbt, but the front-end needs to do real work here: pre-churn behavior, win-back lists, not just one funnel chart. It'll get the time it deserves.</p>
+    <ul class="checklist">
+      <li class="done">Define churn as 90-day inactivity at the customer grain.</li>
+      <li class="done">fct_customer_status_daily — daily snapshot of active/lapsed/churned.</li>
+      <li>Pre-churn behavior heatmap (90 days before lapse).</li>
+      <li>Win-back candidate list, sortable by historic AOV.</li>
+      <li>Channel-level churn rate trend, MoM.</li>
+      <li>Causal-ish: what changed about a customer in the 30 days before they left.</li>
+    </ul>
+    <div style="display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+      <span style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-3);">Target: mid July 2026</span>
+      <a class="btn btn-ghost btn-sm" href="app.html">Back to dashboard →</a>
+    </div>
+  </div>
+</div>
+
+<footer class="site-foot">
+  <div class="left">
+    <span>© 2026 Bonzanini Consulting</span>
+    <span style="color: var(--ink-4)">·</span>
+    <span>Synthetic data — Jaffle Shop</span>
+  </div>
+  <div class="left">
+    <a href="https://github.com" target="_blank" rel="noreferrer">Source</a>
+    <span style="color: var(--ink-4)">·</span>
+    <a href="mailto:felipe@bonzanini.consulting">Contact</a>
+  </div>
+</footer>
+
+</body>
+</html>

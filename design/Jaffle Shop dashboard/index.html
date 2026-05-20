@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Jaffle Shop Analytics — An end-to-end portfolio</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<link rel="stylesheet" href="styles/tokens.css" />
+<link rel="stylesheet" href="styles/site.css" />
+<link rel="stylesheet" href="styles/home.css" />
+</head>
+<body>
+
+<!-- ============= NAV ============= -->
+<nav class="topnav">
+  <a class="brand" href="index.html">
+    <svg class="mark" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+      <g transform="translate(10, 10)">
+        <path d="M0 0 L0 44 L44 44" stroke="#111111" stroke-width="2" stroke-linecap="square"></path>
+        <circle cx="10" cy="34" r="3" fill="#111111"></circle>
+        <circle cx="24" cy="22" r="3" fill="#111111"></circle>
+        <circle cx="38" cy="8" r="3.5" fill="#C8632C"></circle>
+        <path d="M10 34 L24 22 L38 8" stroke="#111111" stroke-width="1.5" stroke-linecap="round"></path>
+      </g>
+    </svg>
+    <div>
+      <div class="wordmark">Jaffle Shop Analytics</div>
+      <div class="tag">BONZANINI CONSULTING · PORTFOLIO</div>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="active">Overview</a>
+    <a href="app.html">Dashboard</a>
+    <a href="ltv.html">LTV<span class="stub">·wip</span></a>
+    <a href="churn.html">Churn<span class="stub">·wip</span></a>
+    <a href="data-quality.html">Data quality<span class="stub">·wip</span></a>
+  </div>
+  <div class="env">
+    <span class="dot"></span>
+    <span>duckdb · prod</span>
+    <span style="color: var(--ink-4)">·</span>
+    <span>v0.4.2</span>
+  </div>
+</nav>
+
+<!-- ============= HERO ============= -->
+<section class="hero">
+  <div class="hero-pattern"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="eyebrow-num">
+        <span class="idx">01</span>
+        <span>Portfolio · 2026</span>
+      </div>
+      <h1 class="display">An end-to-end<br/>analytics rebuild,<br/>on synthetic data.</h1>
+      <p class="lede">
+        I took the Jaffle Shop dataset and ran it end-to-end: orchestration,
+        warehouse, transformations, tests, an API, and a clean reporting front-end.
+        This site is the front-end. Open the dashboard, or read the notes below.
+      </p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="app.html">Open the dashboard →</a>
+        <a class="btn btn-ghost" href="#architecture">How it was built</a>
+      </div>
+    </div>
+    <aside class="hero-side">
+      <dl>
+        <dt>Author</dt><dd>Felipe Bonzanini</dd>
+        <dt>Built</dt><dd>Apr — May 2026</dd>
+        <dt>Status</dt><dd><span style="color: var(--signal-pos)">●</span> Dashboard live</dd>
+        <dt>Dataset</dt><dd>Jaffle Shop · synthetic</dd>
+        <dt>Stack</dt><dd>Dagster · DuckDB · dbt · FastAPI · React</dd>
+        <dt>Source</dt><dd><a href="https://github.com" target="_blank" rel="noreferrer">github.com/fb/jaffle-shop</a></dd>
+      </dl>
+    </aside>
+  </div>
+</section>
+
+<!-- ============= ABOUT ============= -->
+<section class="section" id="about">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow-num"><span class="idx">02</span><span>About the project</span></div>
+      <h2>What this is, and why it exists.</h2>
+    </div>
+    <div class="lede">
+      <p>
+        Most analytics portfolios are a notebook with a bar chart. I wanted something
+        closer to what I actually build for clients — a real pipeline, real tests,
+        a real semantic layer, and a reporting surface someone could hand to a CFO.
+      </p>
+      <p>
+        Jaffle Shop is the canonical fake dataset in the dbt ecosystem: orders, customers,
+        and payments for a fictional sandwich chain. It's small enough to keep the focus
+        on the system, not the data — which is the point.
+      </p>
+    </div>
+  </div>
+
+  <ul class="dataset-facts">
+    <li><span class="k">Dataset</span><span class="v">Jaffle Shop — synthetic retail data, public</span></li>
+    <li><span class="k">Volume</span><span class="v"><span class="accent">~1.2M</span> orders · <span class="accent">~42K</span> customers · <span class="accent">6</span> stores · 24 months of history</span></li>
+    <li><span class="k">Grain</span><span class="v">Daily order-line at source, modeled into a Kimball star</span></li>
+    <li><span class="k">Refresh</span><span class="v">Daily at 06:00 UTC via Dagster sensor</span></li>
+    <li><span class="k">Numbers</span><span class="v">Demo-clean rounded figures. Don't use these for a board meeting.</span></li>
+  </ul>
+</section>
+
+<!-- ============= ARCHITECTURE (dark) ============= -->
+<section class="section dark" id="architecture">
+  <div class="inner">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow-num"><span class="idx">03</span><span>Architecture</span></div>
+        <h2>How the data gets from CSV to chart.</h2>
+      </div>
+      <div class="lede">
+        <p>
+          Six stages, each owned by one tool that's good at one thing.
+          Nothing exotic — this is the same shape I deploy for retail clients,
+          shrunk to fit a personal project.
+        </p>
+      </div>
+    </div>
+
+    <div class="arch-flow">
+      <div class="arch-step">
+        <div class="step-arrow">→</div>
+        <span class="step-n">01</span>
+        <span class="step-role">Orchestrate</span>
+        <h3 class="step-tool">Dagster</h3>
+        <p class="step-desc">Daily sensor lands raw CSVs into the lake. Asset-first orchestration, lineage out of the box.</p>
+      </div>
+      <div class="arch-step">
+        <div class="step-arrow">→</div>
+        <span class="step-n">02</span>
+        <span class="step-role">Store</span>
+        <h3 class="step-tool">DuckDB</h3>
+        <p class="step-desc">Single-file warehouse for the staging + mart layers. Embedded, fast, free.</p>
+      </div>
+      <div class="arch-step">
+        <div class="step-arrow">→</div>
+        <span class="step-n">03</span>
+        <span class="step-role">Transform</span>
+        <h3 class="step-tool">dbt</h3>
+        <p class="step-desc">Kimball star schema — dim_customer, dim_product, dim_store, fct_orders.</p>
+      </div>
+      <div class="arch-step">
+        <div class="step-arrow">→</div>
+        <span class="step-n">04</span>
+        <span class="step-role">Test</span>
+        <h3 class="step-tool">Elementary</h3>
+        <p class="step-desc">Anomaly detection + freshness + schema tests. Results feed the /data-quality page.</p>
+      </div>
+      <div class="arch-step">
+        <div class="step-arrow">→</div>
+        <span class="step-n">05</span>
+        <span class="step-role">Serve</span>
+        <h3 class="step-tool">FastAPI</h3>
+        <p class="step-desc">Thin read-only API on top of DuckDB marts. One endpoint per chart, cached for a minute.</p>
+      </div>
+      <div class="arch-step">
+        <span class="step-n">06</span>
+        <span class="step-role">Render</span>
+        <h3 class="step-tool">React</h3>
+        <p class="step-desc">This site. Recharts for the viz, Bonzanini Consulting design system for everything else.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= SCOPE ============= -->
+<section class="section">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow-num"><span class="idx">04</span><span>Scope</span></div>
+      <h2>What's in, and what isn't.</h2>
+    </div>
+    <div class="lede">
+      <p>
+        A portfolio piece, not a production system. I made deliberate cuts where
+        the next 80% of the work wouldn't have taught me anything new. Those are
+        listed on the right — and they're honest.
+      </p>
+    </div>
+  </div>
+
+  <div class="scope">
+    <div>
+      <h3>In scope</h3>
+      <ul>
+        <li><span class="marker">+</span><span>Daily ingest of raw Jaffle Shop CSVs into a versioned lake.</span></li>
+        <li><span class="marker">+</span><span>Full dbt project — staging, intermediate, marts — with refs and tests.</span></li>
+        <li><span class="marker">+</span><span>Kimball star schema covering orders, customers, products, stores.</span></li>
+        <li><span class="marker">+</span><span>Elementary checks: freshness, row-count anomaly, schema drift.</span></li>
+        <li><span class="marker">+</span><span>Read-only FastAPI with simple LRU caching.</span></li>
+        <li><span class="marker">+</span><span>This dashboard plus three deep-dive reports.</span></li>
+      </ul>
+    </div>
+    <div class="out">
+      <h3>Out of scope</h3>
+      <ul>
+        <li><span class="marker">−</span><span>Authentication, multi-tenancy, role-based access.</span></li>
+        <li><span class="marker">−</span><span>A real semantic layer (Cube, MetricFlow). Mart tables are the contract.</span></li>
+        <li><span class="marker">−</span><span>CI/CD beyond a github action that runs dbt build on PR.</span></li>
+        <li><span class="marker">−</span><span>Real-time / streaming. Daily batch only.</span></li>
+        <li><span class="marker">−</span><span>Reverse-ETL or activation. Numbers stay in the warehouse.</span></li>
+        <li><span class="marker">−</span><span>ML / forecasting. Trend lines are descriptive only.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============= STACK ============= -->
+<section class="section">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow-num"><span class="idx">05</span><span>Tech stack</span></div>
+      <h2>What's under the hood.</h2>
+    </div>
+    <div class="lede">
+      <p>
+        Boring, on purpose. Every choice here is something I'd be comfortable
+        defending at a Tuesday architecture review.
+      </p>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="stack-group">
+      <h4>Orchestration</h4>
+      <ul>
+        <li>Dagster<small>asset-based, daily sensor</small></li>
+        <li>uv<small>python env + lock</small></li>
+      </ul>
+    </div>
+    <div class="stack-group">
+      <h4>Warehouse</h4>
+      <ul>
+        <li>DuckDB 1.0<small>embedded analytics db</small></li>
+        <li>Parquet<small>raw + staging files</small></li>
+      </ul>
+    </div>
+    <div class="stack-group">
+      <h4>Modeling</h4>
+      <ul>
+        <li>dbt-core 1.8<small>~40 models, Kimball star</small></li>
+        <li>SQLFluff<small>lint on PR</small></li>
+        <li>Elementary<small>data tests + observability</small></li>
+      </ul>
+    </div>
+    <div class="stack-group">
+      <h4>Backend</h4>
+      <ul>
+        <li>FastAPI<small>read-only mart API</small></li>
+        <li>Pydantic v2<small>contracts + validation</small></li>
+        <li>Redis<small>1-minute LRU cache</small></li>
+      </ul>
+    </div>
+    <div class="stack-group">
+      <h4>Frontend</h4>
+      <ul>
+        <li>React 18<small>TanStack Query + Router</small></li>
+        <li>Recharts<small>data viz</small></li>
+        <li>Vite<small>build · GitHub Pages</small></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============= REPORTS ============= -->
+<section class="section">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow-num"><span class="idx">06</span><span>The reports</span></div>
+      <h2>Four surfaces, one warehouse.</h2>
+    </div>
+    <div class="lede">
+      <p>
+        The dashboard is the front door. The other three reports zoom in
+        on the questions a retail operator actually asks about a customer
+        base: who comes back, who walks away, can I trust the numbers.
+      </p>
+    </div>
+  </div>
+
+  <div class="reports">
+    <a class="report-card" href="app.html">
+      <div class="meta">
+        <span class="badge live">Live</span>
+        <span>/app · YTD overview</span>
+      </div>
+      <h3>Dashboard</h3>
+      <p>YTD metrics, cumulative race vs. prior year, product mix, store performance, retention, daily patterns.</p>
+      <span class="report-arrow">Open report →</span>
+    </a>
+
+    <a class="report-card" href="ltv.html">
+      <div class="meta">
+        <span class="badge wip">Planned</span>
+        <span>/ltv · Lifetime value</span>
+      </div>
+      <h3>LTV</h3>
+      <p>Cohort-based contribution margin curves. P50 / P90. Payback windows by channel and segment.</p>
+      <span class="report-arrow">Open report →</span>
+    </a>
+
+    <a class="report-card" href="churn.html">
+      <div class="meta">
+        <span class="badge wip">Planned</span>
+        <span>/churn · Customer churn</span>
+      </div>
+      <h3>Churn</h3>
+      <p>Lapsed-customer detection on rolling windows. Pre-churn behavior signals, win-back candidate lists.</p>
+      <span class="report-arrow">Open report →</span>
+    </a>
+
+    <a class="report-card" href="data-quality.html">
+      <div class="meta">
+        <span class="badge wip">Planned</span>
+        <span>/data-quality · Pipeline health</span>
+      </div>
+      <h3>Data quality</h3>
+      <p>Live mirror of the Elementary report — freshness, schema drift, anomaly alerts on every fact table.</p>
+      <span class="report-arrow">Open report →</span>
+    </a>
+  </div>
+</section>
+
+<!-- ============= AUTHOR + CHANGELOG ============= -->
+<section class="section">
+  <div class="author-row">
+    <div class="author">
+      <div class="eyebrow-num"><span class="idx">07</span><span>About me</span></div>
+      <h2 style="font-family: var(--font-serif); font-size: 42px; font-weight: 400; letter-spacing: -0.02em; line-height: 1.0; margin: 16px 0 24px; color: var(--ink); max-width: 18ch; text-wrap: balance;">
+        Felipe Bonzanini.
+      </h2>
+      <p>
+        Fractional analytics leader. Eight years deep in Looker — the rest in dbt,
+        warehouse engineering, and dragging retail data teams out of dashboards
+        that no one trusts. This project is the closest I get to a public résumé.
+      </p>
+      <p>
+        If you have a Looker instance that's slowing your team down — or a stack
+        that's mostly held together by one tired analyst — I fix that.
+      </p>
+      <div class="author-meta">
+        <a href="mailto:felipe@bonzanini.consulting">felipe@bonzanini.consulting</a>
+        <span style="color: var(--ink-4)">·</span>
+        <a href="https://linkedin.com" target="_blank" rel="noreferrer">LinkedIn</a>
+        <span style="color: var(--ink-4)">·</span>
+        <a href="https://github.com" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+    <div>
+      <div class="eyebrow-num" style="margin-bottom: 18px;"><span class="idx">08</span><span>Changelog</span></div>
+      <div class="changelog">
+        <div class="entry">
+          <span class="date">May 20, 2026</span>
+          <span class="ver">v0.4.2</span>
+          <span class="note">Dashboard goes live — five KPIs, hero race, six deep-dive charts.</span>
+        </div>
+        <div class="entry">
+          <span class="date">May 12, 2026</span>
+          <span class="ver">v0.4.0</span>
+          <span class="note">FastAPI ships. React app wired to live mart endpoints.</span>
+        </div>
+        <div class="entry">
+          <span class="date">May 03, 2026</span>
+          <span class="ver">v0.3.0</span>
+          <span class="note">Elementary integrated, anomaly tests pass on all fact tables.</span>
+        </div>
+        <div class="entry">
+          <span class="date">Apr 24, 2026</span>
+          <span class="ver">v0.2.0</span>
+          <span class="note">dbt project complete — 40 models, full lineage, Kimball star.</span>
+        </div>
+        <div class="entry">
+          <span class="date">Apr 12, 2026</span>
+          <span class="ver">v0.1.0</span>
+          <span class="note">Dagster repo bootstrapped, raw CSVs landing in DuckDB nightly.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= FOOTER ============= -->
+<footer class="site-foot">
+  <div class="left">
+    <span>© 2026 Bonzanini Consulting</span>
+    <span style="color: var(--ink-4)">·</span>
+    <span>Synthetic data — Jaffle Shop</span>
+  </div>
+  <div class="left">
+    <a href="https://github.com" target="_blank" rel="noreferrer">Source</a>
+    <span style="color: var(--ink-4)">·</span>
+    <a href="mailto:felipe@bonzanini.consulting">Contact</a>
+  </div>
+</footer>
+
+</body>
+</html>

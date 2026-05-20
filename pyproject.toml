@@ -50,7 +50,10 @@ extend-exclude = ["dbt/target", "dbt/dbt_packages", "data", "web", "design"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "N", "SIM", "RUF"]
-ignore = ["E501"]
+ignore = ["E501", "B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"api/jaffle_api/routes/app.py" = ["RUF001"]
 
 [tool.pytest.ini_options]
 testpaths = ["pipeline/tests", "api/tests"]

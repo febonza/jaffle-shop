@@ -1,0 +1,180 @@
+/* Jaffle Shop Analytics — site-wide styles
+   Builds on tokens.css. Editorial consulting aesthetic, mid-density. */
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  background: var(--paper);
+  color: var(--ink-2);
+  min-height: 100vh;
+}
+
+/* ============= Top nav ============= */
+.topnav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 32px;
+  border-bottom: 1px solid var(--ink);
+  background: var(--paper);
+  position: sticky; top: 0; z-index: 50;
+}
+.topnav .brand {
+  display: flex; align-items: center; gap: 12px;
+  text-decoration: none; color: var(--ink);
+}
+.topnav .brand .mark { height: 28px; width: 28px; display: block; }
+.topnav .brand .wordmark {
+  font-family: var(--font-serif);
+  font-size: 19px; font-weight: 500;
+  letter-spacing: -0.01em; line-height: 1;
+  color: var(--ink);
+}
+.topnav .brand .tag {
+  font-family: var(--font-sans);
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.18em; color: var(--ink-3);
+  text-transform: uppercase; line-height: 1;
+  margin-top: 4px;
+}
+.topnav .nav-links {
+  display: flex; gap: 28px;
+  font-family: var(--font-sans);
+}
+.topnav .nav-links a {
+  font-size: 13px; font-weight: 500;
+  color: var(--ink); text-decoration: none;
+  padding: 6px 0;
+  border-bottom: 1px solid transparent;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.topnav .nav-links a:hover { color: var(--accent-deep); }
+.topnav .nav-links a.active {
+  border-bottom-color: var(--accent);
+  color: var(--ink);
+}
+.topnav .nav-links a .stub {
+  font-family: var(--font-mono);
+  font-size: 9px; color: var(--ink-4);
+  margin-left: 4px; letter-spacing: 0.04em;
+}
+.topnav .env {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-mono); font-size: 11px; color: var(--ink-3);
+}
+.topnav .env .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--signal-pos);
+}
+
+/* ============= Layout ============= */
+.page { padding: 64px 48px 96px; max-width: var(--container); margin: 0 auto; }
+.page-narrow { padding: 64px 48px 96px; max-width: var(--container-narrow); margin: 0 auto; }
+
+.eyebrow-num {
+  font-family: var(--font-sans);
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-3);
+  display: flex; align-items: center; gap: 10px;
+}
+.eyebrow-num .idx {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+
+/* ============= Page title block ============= */
+.page-title {
+  font-family: var(--font-serif);
+  font-size: clamp(40px, 5vw, 64px);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.0;
+  color: var(--ink);
+  margin: 18px 0 20px;
+  text-wrap: balance;
+  max-width: 22ch;
+}
+.page-lede {
+  font-family: var(--font-sans);
+  font-size: 19px; line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 60ch;
+  text-wrap: pretty;
+  margin: 0;
+}
+
+/* ============= Buttons ============= */
+.btn {
+  font-family: var(--font-sans);
+  font-weight: 600; font-size: 13px;
+  padding: 12px 18px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: all var(--dur) var(--ease);
+  letter-spacing: 0.01em;
+}
+.btn-primary { background: var(--ink); color: var(--paper); }
+.btn-primary:hover { background: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
+.btn-ghost:hover { background: var(--ink); color: var(--paper); }
+.btn-sm { font-size: 12px; padding: 8px 12px; }
+
+/* ============= Stub page ============= */
+.stub-page {
+  min-height: calc(100vh - 60px);
+  display: grid; place-items: center;
+  padding: 48px;
+}
+.stub-card {
+  max-width: 580px; text-align: left;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 56px;
+  position: relative;
+}
+.stub-card .badge {
+  position: absolute; top: -1px; right: -1px;
+  background: var(--ink); color: var(--paper);
+  font-family: var(--font-mono); font-size: 10px;
+  padding: 6px 10px; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.stub-card h1 {
+  font-family: var(--font-serif); font-size: 48px; font-weight: 400;
+  letter-spacing: -0.025em; line-height: 1.0; margin: 16px 0 16px;
+  color: var(--ink);
+}
+.stub-card p {
+  font-size: 16px; line-height: 1.55; color: var(--ink-2);
+  margin: 0 0 24px;
+}
+.stub-card .checklist {
+  margin: 24px 0 32px; padding: 0; list-style: none;
+  border-top: 1px solid var(--rule-soft);
+}
+.stub-card .checklist li {
+  padding: 12px 0; font-family: var(--font-mono); font-size: 13px;
+  color: var(--ink-2); border-bottom: 1px solid var(--rule-soft);
+  display: flex; align-items: center; gap: 12px;
+}
+.stub-card .checklist li::before {
+  content: '☐'; color: var(--ink-4); font-family: var(--font-mono);
+}
+.stub-card .checklist li.done::before { content: '☑'; color: var(--accent); }
+.stub-card .checklist li.done { color: var(--ink-3); }
+
+/* ============= Footer ============= */
+.site-foot {
+  background: var(--ink-bg);
+  color: var(--ink-fg-2);
+  padding: 28px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font-mono); font-size: 11px;
+  border-top: 1px solid var(--ink);
+}
+.site-foot .left { display: flex; gap: 18px; align-items: center; }
+.site-foot a { color: var(--ink-fg-2); text-decoration: none; transition: color var(--dur) var(--ease); }
+.site-foot a:hover { color: var(--accent); }

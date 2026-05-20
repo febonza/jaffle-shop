@@ -40,9 +40,12 @@ data/*.parquet
 # Elementary
 edr_target/
 
-# Web build outputs
+# Web build outputs and compiled TS artifacts
 web/public/elementary/
 web/public/data-model.html
+web/src/**/*.js
+web/vite.config.js
+web/vite.config.d.ts
 
 # Editor / OS
 .DS_Store

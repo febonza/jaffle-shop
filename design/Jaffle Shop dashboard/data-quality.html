@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Data quality · Jaffle Shop Analytics</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<link rel="stylesheet" href="styles/tokens.css" />
+<link rel="stylesheet" href="styles/site.css" />
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="brand" href="index.html">
+    <svg class="mark" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+      <g transform="translate(10, 10)">
+        <path d="M0 0 L0 44 L44 44" stroke="#111111" stroke-width="2" stroke-linecap="square"></path>
+        <circle cx="10" cy="34" r="3" fill="#111111"></circle>
+        <circle cx="24" cy="22" r="3" fill="#111111"></circle>
+        <circle cx="38" cy="8" r="3.5" fill="#C8632C"></circle>
+        <path d="M10 34 L24 22 L38 8" stroke="#111111" stroke-width="1.5" stroke-linecap="round"></path>
+      </g>
+    </svg>
+    <div>
+      <div class="wordmark">Jaffle Shop Analytics</div>
+      <div class="tag">BONZANINI CONSULTING · PORTFOLIO</div>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="index.html">Overview</a>
+    <a href="app.html">Dashboard</a>
+    <a href="ltv.html">LTV<span class="stub">·wip</span></a>
+    <a href="churn.html">Churn<span class="stub">·wip</span></a>
+    <a href="data-quality.html" class="active">Data quality<span class="stub">·wip</span></a>
+  </div>
+  <div class="env">
+    <span class="dot"></span>
+    <span>duckdb · prod</span>
+    <span style="color: var(--ink-4)">·</span>
+    <span>v0.4.2</span>
+  </div>
+</nav>
+
+<div class="stub-page">
+  <div class="stub-card">
+    <div class="badge">Placeholder · WIP</div>
+    <div class="eyebrow-num">
+      <span class="idx">05</span>
+      <span>Data quality</span>
+    </div>
+    <h1>Data quality</h1>
+    <p style="font-family: var(--font-sans); font-size: 19px; color: var(--ink-2); margin-bottom: 22px;">A live read of what's broken in the pipeline, right now.</p>
+    <p>Stubbed. The Elementary tests are running on every dbt build — I just haven't built the mirror UI yet. The plan is to surface freshness, anomaly checks, and schema-drift alerts in one place so the dashboard's numbers earn trust.</p>
+    <ul class="checklist">
+      <li class="done">Elementary integrated, anomaly tests pass on all fact tables.</li>
+      <li class="done">dbt source freshness checks running daily.</li>
+      <li>Pull Elementary run results into a Postgres-backed history.</li>
+      <li>Render freshness + row-count status per source, hourly buckets.</li>
+      <li>Schema-drift alerts on column add/drop.</li>
+      <li>Single trust score per fact table — green/amber/red, plain English.</li>
+    </ul>
+    <div style="display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+      <span style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-3);">Target: end June 2026</span>
+      <a class="btn btn-ghost btn-sm" href="app.html">Back to dashboard →</a>
+    </div>
+  </div>
+</div>
+
+<footer class="site-foot">
+  <div class="left">
+    <span>© 2026 Bonzanini Consulting</span>
+    <span style="color: var(--ink-4)">·</span>
+    <span>Synthetic data — Jaffle Shop</span>
+  </div>
+  <div class="left">
+    <a href="https://github.com" target="_blank" rel="noreferrer">Source</a>
+    <span style="color: var(--ink-4)">·</span>
+    <a href="mailto:felipe@bonzanini.consulting">Contact</a>
+  </div>
+</footer>
+
+</body>
+</html>

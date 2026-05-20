@@ -57,7 +57,7 @@ def load_manifest() -> dict:
 def gather_models(manifest: dict) -> dict[str, dict]:
     """Return {model_name: node_dict} for our target marts."""
     out: dict[str, dict] = {}
-    for node_id, node in manifest.get("nodes", {}).items():
+    for _node_id, node in manifest.get("nodes", {}).items():
         if node.get("resource_type") != "model":
             continue
         if node.get("name") in TARGET_MODELS:

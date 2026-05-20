@@ -13,3 +13,46 @@ models:
       - name: orders
       - name: gmv_usd
       - name: unique_customers
+
+  - name: mart_store_revenue_daily
+    description: |
+      **Grain:** one row per (ordered_date, store_key).
+      **Represents:** daily revenue and order metrics broken out by store, without date-gap filling.
+      **Used by:** `/api/app/kpis`, `/api/app/revenue-race`, `/api/app/stores` — the app-dashboard endpoints that let users filter by date range and store.
+      **Business rules:** ordered_date is the date portion of fct_orders.ordered_at. YTD / period windows are applied at query time by the API, not pre-baked into this mart.
+      **Trade-offs:** no gap-filling (zero-order days for a store are absent). The API coalesces to 0 when aggregating.
+      **Excludes:** refunds and returns (jafgen has none).
+      **AI workflow context:** to get chain-wide daily totals, sum across all store_key values for a given ordered_date. Do not JOIN to mart_daily_revenue — they use different granularity.
+    columns:
+      - name: ordered_date
+        description: |
+          **Grain:** per (date, store).
+          **Represents:** calendar date the orders were placed.
+          **Business rules:** not_null; combined with store_key forms the composite primary key.
+        data_tests: [not_null]
+      - name: store_key
+        description: |
+          **Grain:** per (date, store).
+          **Represents:** surrogate key into dim_stores.
+          **Business rules:** not_null. Use store_id/store_name (denormalised here) for display; use store_key for joins.
+        data_tests: [not_null]
+      - name: store_id
+        description: Natural key of the store (jafgen-issued). Denormalised from dim_stores for convenience.
+      - name: store_name
+        description: Human-readable store name. Denormalised from dim_stores.
+      - name: orders
+        description: Count of orders placed at this store on this date.
+      - name: gmv_usd
+        description: |
+          **Represents:** gross merchandise value (order_total_usd) summed for this store-day.
+          **Includes:** tax. Same basis as fct_orders.order_total_usd.
+          **Excludes:** refunds.
+      - name: subtotal_usd
+        description: Pre-tax revenue summed for this store-day.
+      - name: tax_usd
+        description: Tax component summed for this store-day.
+      - name: item_count
+        description: Total line items ordered at this store on this date.
+      - name: unique_customers
+        description: Count of distinct customers who ordered at this store on this date. Day-grain distinct counts; do not sum for multi-day windows — recompute from fct_orders instead.
+

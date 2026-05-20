@@ -1,34 +1,82 @@
 import { NavLink } from "react-router-dom";
 import type { ReactNode } from "react";
 
+const NAV_LINKS = [
+  { to: "/", label: "Overview", end: true },
+  { to: "/app", label: "Dashboard" },
+  { to: "/ltv", label: "LTV", stub: true },
+  { to: "/churn", label: "Churn", stub: true },
+  { to: "/data-quality", label: "Data quality", stub: true },
+];
+
+function TopNav() {
+  return (
+    <nav className="topnav">
+      <NavLink className="brand" to="/">
+        <svg className="mark" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <g transform="translate(10, 10)">
+            <path d="M0 0 L0 44 L44 44" stroke="#111111" strokeWidth="2" strokeLinecap="square" />
+            <circle cx="10" cy="34" r="3" fill="#111111" />
+            <circle cx="24" cy="22" r="3" fill="#111111" />
+            <circle cx="38" cy="8" r="3.5" fill="var(--accent)" />
+            <path d="M10 34 L24 22 L38 8" stroke="#111111" strokeWidth="1.5" strokeLinecap="round" />
+          </g>
+        </svg>
+        <div>
+          <div className="wordmark">Jaffle Shop Analytics</div>
+          <div className="tag">BONZANINI CONSULTING · PORTFOLIO</div>
+        </div>
+      </NavLink>
+
+      <div className="nav-links">
+        {NAV_LINKS.map((l) => (
+          <NavLink
+            key={l.to}
+            to={l.to}
+            end={l.end}
+            className={({ isActive }) => (isActive ? "active" : "")}
+          >
+            {l.label}
+            {l.stub && <span className="stub">·wip</span>}
+          </NavLink>
+        ))}
+      </div>
+
+      <div className="env">
+        <span className="dot" />
+        <span>duckdb · prod</span>
+        <span style={{ color: "var(--ink-4)" }}>·</span>
+        <span>v0.4.2</span>
+      </div>
+    </nav>
+  );
+}
+
+function SiteFoot() {
+  return (
+    <footer className="site-foot">
+      <div className="left">
+        <span>© 2026 Bonzanini Consulting</span>
+        <span style={{ color: "var(--ink-4)" }}>·</span>
+        <span>Synthetic data — Jaffle Shop</span>
+      </div>
+      <div className="left">
+        <a href="https://github.com/febonza/jaffle-shop" target="_blank" rel="noreferrer">
+          Source
+        </a>
+        <span style={{ color: "var(--ink-4)" }}>·</span>
+        <a href="mailto:felipe@bonzanini.consulting">Contact</a>
+      </div>
+    </footer>
+  );
+}
+
 export default function Layout({ children }: { children: ReactNode }) {
   return (
     <>
-      <header className="container">
-        <nav className="nav">
-          <NavLink to="/" className="nav-brand">
-            Jaffle Shop
-          </NavLink>
-          <div className="nav-links">
-            <NavLink to="/" end>
-              Overview
-            </NavLink>
-            <NavLink to="/churn">Churn</NavLink>
-            <NavLink to="/ltv">LTV</NavLink>
-            <NavLink to="/data-quality">Data quality</NavLink>
-          </div>
-        </nav>
-      </header>
-      <main className="container">{children}</main>
-      <footer className="footer">
-        <div className="container">
-          <span className="muted">
-            Jaffle Shop analytics — built on jafgen, dbt, Dagster, DuckDB,
-            Elementary. Source on{" "}
-            <a href="https://github.com/febonza/jaffle-shop">GitHub</a>.
-          </span>
-        </div>
-      </footer>
+      <TopNav />
+      {children}
+      <SiteFoot />
     </>
   );
 }

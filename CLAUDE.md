@@ -6,14 +6,18 @@ Read this before doing anything. Goal: get a future Claude session up to speed w
 
 A portfolio project showing an **end-to-end analytics stack** on synthetic Jaffle Shop data: jafgen → DuckDB (raw) → dbt (Kimball star) → Elementary tests → FastAPI → React dashboard. Daily Dagster schedule simulates fresh data arriving each morning. Designed to be polished, public-facing, and deployable to a Hostinger VPS.
 
+**Site schema:** `/` landing (editorial, no data) → `/app` dashboard (live data) → `/ltv` `/churn` `/data-quality` stub pages (backend marts not yet built).
+
 ## Layout (top-level)
 
 ```
 design/                      Bonzanini Consulting design system — DO NOT modify
+  Jaffle Shop dashboard/     Claude Design prototype; ported into web/ — do not modify
 pipeline/jaffle_pipeline/    Dagster: ingestion, dbt_assets, schedule, jafgen_runner
 api/jaffle_api/              FastAPI app (read-only DuckDB → JSON)
+  routes/app.py              All /app/* endpoints (KPIs, revenue race, categories, products, stores, order-size)
 dbt/                         dbt project named "jaffle" — staging/intermediate/marts/snapshots
-web/                         Vite + React + TS dashboard (Recharts)
+web/                         Vite + React + TS multi-page site (Recharts)
 scripts/                     bootstrap helpers (dim_date, data-model HTML)
 docs/                        data-model.html, data-dictionary.md
 data/                        gitignored — jafgen CSVs, jaffle.duckdb
@@ -45,6 +49,13 @@ Run all commands from the **repo root** (where `pyproject.toml` lives), not from
   - `intermediate` — dbt intermediates (joins, business logic).
   - `analytics` — dbt marts (Kimball facts/dims). **What the API reads.**
   - `elementary` — Elementary metadata.
+
+## API — important context
+
+- **All dashboard endpoints live under `/api/app/`** — `GET /api/app/kpis`, `/api/app/revenue-race`, `/api/app/categories`, `/api/app/products`, `/api/app/stores`, `/api/app/order-size`, `/api/app/store-list`.
+- **Period anchor (`AS_OF`)** — the warehouse holds data through 2026-12-30, but YTD/MTD/etc. must anchor on a fixed date so future rows don't leak into period windows. Default is `2026-05-20`; override with the `JAFFLE_AS_OF=YYYY-MM-DD` environment variable.
+- **DuckDB params quirk** — DuckDB's named-parameter binding throws if the params dict contains keys that aren't referenced in the SQL. Every endpoint uses `_store_filter(store_ids)` which returns `("", {})` when no filter is active, so params never contain unreferenced keys. Keep this pattern if adding new endpoints.
+- **New marts** added for the dashboard: `analytics.mart_store_revenue_daily` (grain: ordered_date × store_key) and `analytics.mart_product_revenue_daily` (grain: ordered_date × store_key × product_key). Both have full doc blocks per the documentation contract.
 
 ## Data strategy — important context
 
@@ -95,14 +106,17 @@ Pushes go to **https://github.com/febonza/jaffle-shop** via the **personal** Git
 - **jafgen is unmaintained** — pinned to 0.4.14, if it breaks on Python 3.13+ stay on 3.10–3.12.
 - **No refunds/returns** in jafgen schema. Doc blocks should call this out where revenue is computed.
 - **Margin requires a BOM seed** — the synthetic `seeds/sku_supplies_bom.csv` maps SKUs to supplies; without it `cogs_usd` / `margin_usd` are unavailable.
-- **`/churn` and `/ltv`** are placeholder pages. The marts for them aren't built yet.
+- **`/churn` and `/ltv` and `/data-quality`** — stub pages are built and styled, but the backend marts that would power them are not yet built.
+- **jafgen data is flat** — all customers are `vip` segment (~99.8%), cohort retention is ~100%, orders happen 24h/day with no lunch/dinner pattern. Charts that depend on meaningful segmentation or behavioral curves won't work on this data.
+- **Only 2 product categories** (`jaffle`, `beverage`) and exactly 10 products. The category chart works; anything needing richer taxonomy does not.
 
 ## Open work (not yet built)
 
 - CI pipeline (`.github/workflows/ci.yml`) — deferred.
 - VPS deployment (`scripts/deploy.sh`, `docs/deploy.md`) — deferred.
-- `/churn` analytics page — placeholder.
-- `/ltv` analytics page — placeholder.
+- `/churn` backend marts + UI — stub page live, analytics not built.
+- `/ltv` backend marts + UI — stub page live, analytics not built.
+- `/data-quality` Elementary mirror UI — stub page live, parsing not built.
 - Failure sensor (Slack/file log) on Dagster assets.
 
 ## Tool conventions

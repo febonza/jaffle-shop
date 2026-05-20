@@ -1,7 +1,9 @@
 # Jaffle Shop Portfolio
 
 End-to-end analytics portfolio on synthetic Jaffle Shop data.
-**Dagster** orchestrates a daily pipeline that lands CSVs into **DuckDB**, builds a Kimball star schema with **dbt**, tests it with **Elementary**, and serves it through a **FastAPI** backend to a **React** dashboard styled with the Bonzanini Consulting design system.
+**Dagster** orchestrates a daily pipeline that lands CSVs into **DuckDB**, builds a Kimball star schema with **dbt**, tests it with **Elementary**, and serves it through a **FastAPI** backend to a multi-page **React** site styled with the Bonzanini Consulting design system.
+
+**Site:** `/` editorial landing → `/app` live dashboard (KPIs, revenue race, categories, products, stores, order-size) → `/ltv` `/churn` `/data-quality` work-in-progress stubs.
 
 ## Stack
 
@@ -45,10 +47,10 @@ uv run python scripts/build_data_model_html.py
 # 7. Dagster UI (localhost:3000) — daily schedule + asset lineage
 uv run dagster dev
 
-# 8. FastAPI (localhost:8000) — runs against the same DuckDB file
-uv run uvicorn jaffle_api.main:app --reload
+# 8. FastAPI (localhost:8001) — runs against the same DuckDB file
+uv run uvicorn jaffle_api.main:app --port 8001 --reload
 
-# 9. Web (localhost:5173) — Vite dev server, proxies /api → :8000
+# 9. Web (localhost:5174) — Vite dev server, proxies /api → :8001
 cd web && npm install && npm run dev
 ```
 
