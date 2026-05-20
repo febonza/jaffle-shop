@@ -37,8 +37,9 @@ body {
   margin-top: 4px;
 }
 .topnav .nav-links {
-  display: flex; gap: 28px;
+  display: flex; gap: 22px;
   font-family: var(--font-sans);
+  flex-wrap: nowrap;
 }
 .topnav .nav-links a {
   font-size: 13px; font-weight: 500;
@@ -46,6 +47,7 @@ body {
   padding: 6px 0;
   border-bottom: 1px solid transparent;
   transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  white-space: nowrap;
 }
 .topnav .nav-links a:hover { color: var(--accent-deep); }
 .topnav .nav-links a.active {
@@ -65,6 +67,25 @@ body {
   width: 6px; height: 6px; border-radius: 50%;
   background: var(--signal-pos);
 }
+.topnav .nav-right {
+  display: flex; align-items: center; gap: 16px;
+}
+.topnav .about-btn {
+  font-family: var(--font-sans);
+  font-size: 12px; font-weight: 500;
+  color: var(--ink); text-decoration: none;
+  padding: 7px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 2px;
+  background: transparent;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+  white-space: nowrap;
+}
+.topnav .about-btn:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+.topnav .about-btn span { margin-left: 4px; }
 
 /* ============= Layout ============= */
 .page { padding: 64px 48px 96px; max-width: var(--container); margin: 0 auto; }

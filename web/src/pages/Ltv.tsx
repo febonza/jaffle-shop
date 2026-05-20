@@ -29,7 +29,7 @@ export default function Ltv() {
           <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--ink-3)" }}>
             Target: late June 2026
           </span>
-          <Link className="btn btn-ghost btn-sm" to="/app">Back to dashboard →</Link>
+          <Link className="btn btn-ghost btn-sm" to="/">Back to dashboard →</Link>
         </div>
       </div>
     </div>

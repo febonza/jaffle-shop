@@ -1,10 +1,9 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
 import type { ReactNode } from "react";
 
 const NAV_LINKS = [
-  { to: "/", label: "Overview", end: true },
-  { to: "/app", label: "Dashboard" },
+  { to: "/", label: "Dashboard", end: true },
   { to: "/ltv", label: "LTV", stub: true },
   { to: "/churn", label: "Churn", stub: true },
   { to: "/data-quality", label: "Data quality", stub: true },
@@ -12,6 +11,7 @@ const NAV_LINKS = [
 
 function TopNav() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const onAbout = useLocation().pathname === "/about";
 
   return (
     <nav className={`topnav${menuOpen ? " nav-open" : ""}`}>
@@ -46,11 +46,14 @@ function TopNav() {
         ))}
       </div>
 
-      <div className="env">
-        <span className="dot" />
-        <span>duckdb · prod</span>
-        <span style={{ color: "var(--ink-4)" }}>·</span>
-        <span>v0.4.2</span>
+      <div className="nav-right">
+        <div className="env">
+          <span className="dot" />
+          <span>duckdb · prod · v0.4.2</span>
+        </div>
+        <NavLink className="about-btn" to={onAbout ? "/" : "/about"} onClick={() => setMenuOpen(false)}>
+          {onAbout ? "Back to dashboard" : "About this dashboard"} <span aria-hidden="true">→</span>
+        </NavLink>
       </div>
 
       <button

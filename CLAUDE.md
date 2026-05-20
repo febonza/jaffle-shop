@@ -6,7 +6,7 @@ Read this before doing anything. Goal: get a future Claude session up to speed w
 
 A portfolio project showing an **end-to-end analytics stack** on synthetic Jaffle Shop data: jafgen → DuckDB (raw) → dbt (Kimball star) → Elementary tests → FastAPI → React dashboard. Daily Dagster schedule simulates fresh data arriving each morning. Designed to be polished, public-facing, and deployable to a Hostinger VPS.
 
-**Site schema:** `/` landing (editorial, no data) → `/app` dashboard (live data) → `/ltv` `/churn` `/data-quality` stub pages (backend marts not yet built).
+**Site schema:** `/` dashboard (live data) → `/about` overview (editorial, no data) → `/ltv` `/churn` `/data-quality` stub pages (backend marts not yet built).
 
 ## Layout (top-level)
 
