@@ -5,7 +5,6 @@ export default function Landing() {
     <>
       {/* ============= HERO ============= */}
       <section className="hero">
-        <div className="hero-pattern" />
         <div className="hero-inner">
           <div>
             <div className="eyebrow-num">
@@ -97,18 +96,21 @@ export default function Landing() {
 
           <div className="arch-flow">
             {[
-              { n: "01", role: "Orchestrate", tool: "Dagster", desc: "Daily sensor lands raw CSVs into the lake. Asset-first orchestration, lineage out of the box.", arrow: true },
-              { n: "02", role: "Store", tool: "DuckDB", desc: "Single-file warehouse for the staging + mart layers. Embedded, fast, free.", arrow: true },
-              { n: "03", role: "Transform", tool: "dbt", desc: "Kimball star schema — dim_customer, dim_product, dim_store, fct_orders.", arrow: true },
-              { n: "04", role: "Test", tool: "Elementary", desc: "Anomaly detection + freshness + schema tests. Results feed the /data-quality page.", arrow: true },
-              { n: "05", role: "Serve", tool: "FastAPI", desc: "Thin read-only API on top of DuckDB marts. One endpoint per chart, cached for a minute.", arrow: true },
-              { n: "06", role: "Render", tool: "React", desc: "This site. Recharts for the viz, Bonzanini Consulting design system for everything else.", arrow: false },
+              { n: "01", role: "Orchestrate", tool: "Dagster", desc: "Daily sensor lands raw CSVs into the lake. Asset-first orchestration, lineage out of the box.", arrow: true, logo: "/assets/logos/dagster-cropped.svg" },
+              { n: "02", role: "Store", tool: "DuckDB", desc: "Single-file warehouse for the staging + mart layers. Embedded, fast, free.", arrow: true, logo: "/assets/logos/duckdb-cropped.svg" },
+              { n: "03", role: "Transform", tool: "dbt", desc: "Kimball star schema — dim_customer, dim_product, dim_store, fct_orders.", arrow: true, logo: "/assets/logos/dbt.svg" },
+              { n: "04", role: "Test", tool: "Elementary", desc: "Anomaly detection + freshness + schema tests. Results feed the /data-quality page.", arrow: true, logo: "/assets/logos/elementary-cropped.svg" },
+              { n: "05", role: "Serve", tool: "FastAPI", desc: "Thin read-only API on top of DuckDB marts. One endpoint per chart, cached for a minute.", arrow: true, logo: "/assets/logos/fastapi-cropped.svg" },
+              { n: "06", role: "Render", tool: "React", desc: "This site. Recharts for the viz, Bonzanini Consulting design system for everything else.", arrow: false, logo: "/assets/logos/react-cropped.svg" },
             ].map((step) => (
               <div className="arch-step" key={step.n}>
                 {step.arrow && <div className="step-arrow">→</div>}
                 <span className="step-n">{step.n}</span>
                 <span className="step-role">{step.role}</span>
-                <h3 className="step-tool">{step.tool}</h3>
+                {step.logo
+                  ? <img className="step-logo" src={step.logo} alt={step.tool} />
+                  : <h3 className="step-tool">{step.tool}</h3>
+                }
                 <p className="step-desc">{step.desc}</p>
               </div>
             ))}
@@ -294,6 +296,7 @@ export default function Landing() {
             <div className="eyebrow-num" style={{ marginBottom: 18 }}><span className="idx">08</span><span>Changelog</span></div>
             <div className="changelog">
               {[
+                { date: "May 20, 2026", ver: "v0.5.0", note: "Responsive layout across all pages. Tech stack logos in the architecture section." },
                 { date: "May 20, 2026", ver: "v0.4.2", note: "Dashboard goes live — five KPIs, hero race, four deep-dive charts." },
                 { date: "May 12, 2026", ver: "v0.4.0", note: "FastAPI ships. React app wired to live mart endpoints." },
                 { date: "May 03, 2026", ver: "v0.3.0", note: "Elementary integrated, anomaly tests pass on all fact tables." },

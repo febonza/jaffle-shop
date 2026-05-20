@@ -178,3 +178,54 @@ body {
 .site-foot .left { display: flex; gap: 18px; align-items: center; }
 .site-foot a { color: var(--ink-fg-2); text-decoration: none; transition: color var(--dur) var(--ease); }
 .site-foot a:hover { color: var(--accent); }
+
+/* ============= Hamburger button (desktop: hidden) ============= */
+.topnav .menu-btn {
+  display: none;
+  background: none; border: none; cursor: pointer;
+  padding: 4px; color: var(--ink);
+  line-height: 1;
+}
+
+/* ============= Responsive ============= */
+@media (max-width: 767px) {
+  .topnav {
+    flex-wrap: wrap;
+    padding: 14px 20px;
+    gap: 0;
+    align-items: center;
+  }
+  .topnav .brand { flex: 1; }
+  .topnav .env { display: none; }
+  .topnav .menu-btn { display: block; }
+  .topnav .nav-links {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    gap: 0;
+    border-top: 1px solid var(--rule-soft);
+    margin-top: 12px;
+    padding-top: 4px;
+  }
+  .topnav.nav-open .nav-links { display: flex; }
+  .topnav .nav-links a {
+    font-size: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    border-left: none; border-right: none;
+  }
+  .topnav .nav-links a:last-child { border-bottom: 0; }
+
+  .page, .page-narrow { padding: 40px 20px 64px; }
+
+  .stub-page { padding: 24px; }
+  .stub-card { padding: 32px 24px; }
+  .stub-card h1 { font-size: 36px; }
+
+  .site-foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 20px;
+  }
+}

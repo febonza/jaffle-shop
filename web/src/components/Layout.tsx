@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { useState } from "react";
 import type { ReactNode } from "react";
 
 const NAV_LINKS = [
@@ -10,9 +11,11 @@ const NAV_LINKS = [
 ];
 
 function TopNav() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
-    <nav className="topnav">
-      <NavLink className="brand" to="/">
+    <nav className={`topnav${menuOpen ? " nav-open" : ""}`}>
+      <NavLink className="brand" to="/" onClick={() => setMenuOpen(false)}>
         <svg className="mark" viewBox="0 0 64 64" fill="none" aria-hidden="true">
           <g transform="translate(10, 10)">
             <path d="M0 0 L0 44 L44 44" stroke="#111111" strokeWidth="2" strokeLinecap="square" />
@@ -35,6 +38,7 @@ function TopNav() {
             to={l.to}
             end={l.end}
             className={({ isActive }) => (isActive ? "active" : "")}
+            onClick={() => setMenuOpen(false)}
           >
             {l.label}
             {l.stub && <span className="stub">·wip</span>}
@@ -48,6 +52,23 @@ function TopNav() {
         <span style={{ color: "var(--ink-4)" }}>·</span>
         <span>v0.4.2</span>
       </div>
+
+      <button
+        className="menu-btn"
+        aria-label={menuOpen ? "Close menu" : "Open menu"}
+        aria-expanded={menuOpen}
+        onClick={() => setMenuOpen((o) => !o)}
+      >
+        {menuOpen ? (
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M4 4 L16 16 M16 4 L4 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
+          </svg>
+        ) : (
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M3 5 H17 M3 10 H17 M3 15 H17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
+          </svg>
+        )}
+      </button>
     </nav>
   );
 }
