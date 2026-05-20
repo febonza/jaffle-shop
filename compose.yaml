@@ -2,6 +2,7 @@ name: jaffle-shop
 
 x-app-env: &app-env
   JAFFLE_AS_OF: "2026-05-20"
+  JAFFLE_DUCKDB_PATH: /app/data/jaffle.duckdb
   DAGSTER_HOME: /dagster_home
   TZ: America/Sao_Paulo
 
