@@ -5,7 +5,7 @@ from __future__ import annotations
 import shutil
 import subprocess
 
-from dagster import AssetExecutionContext, MaterializeResult, MetadataValue, asset
+from dagster import MaterializeResult, MetadataValue, asset
 
 from jaffle_pipeline.assets.dbt_assets import jaffle_dbt
 from jaffle_pipeline.paths import (
@@ -21,7 +21,7 @@ from jaffle_pipeline.paths import (
     deps=[jaffle_dbt],
     compute_kind="elementary",
 )
-def elementary_report(context: AssetExecutionContext):
+def elementary_report(context):
     """Run `edr report` and copy the resulting HTML into web/public/elementary/.
 
     Caller responsibility: the React app's /data-quality route iframes

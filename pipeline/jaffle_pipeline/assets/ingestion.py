@@ -154,7 +154,7 @@ def _load_partition(
     partitions_def=daily_partitions,
     compute_kind="duckdb",
 )
-def raw_orders(context: AssetExecutionContext, duckdb: DuckDBResource):
+def raw_orders(context, duckdb: DuckDBResource):
     return _load_partition(
         context, duckdb, "raw_orders.csv", "raw_orders", date_column="ordered_at"
     )
@@ -168,7 +168,7 @@ def raw_orders(context: AssetExecutionContext, duckdb: DuckDBResource):
     deps=[raw_orders],
     compute_kind="duckdb",
 )
-def raw_items(context: AssetExecutionContext, duckdb: DuckDBResource):
+def raw_items(context, duckdb: DuckDBResource):
     # jafgen names this file raw_items.csv (not raw_order_items.csv)
     return _load_partition(
         context,
@@ -182,22 +182,22 @@ def raw_items(context: AssetExecutionContext, duckdb: DuckDBResource):
 # ----------------------------- dimensions --------------------------------- #
 
 @asset(name="raw_customers", key_prefix=["raw"], group_name="ingestion", compute_kind="duckdb")
-def raw_customers(context: AssetExecutionContext, duckdb: DuckDBResource):
+def raw_customers(context, duckdb: DuckDBResource):
     return _load_full_csv(context, duckdb, "raw_customers.csv", "raw_customers")
 
 
 @asset(name="raw_products", key_prefix=["raw"], group_name="ingestion", compute_kind="duckdb")
-def raw_products(context: AssetExecutionContext, duckdb: DuckDBResource):
+def raw_products(context, duckdb: DuckDBResource):
     return _load_full_csv(context, duckdb, "raw_products.csv", "raw_products")
 
 
 @asset(name="raw_stores", key_prefix=["raw"], group_name="ingestion", compute_kind="duckdb")
-def raw_stores(context: AssetExecutionContext, duckdb: DuckDBResource):
+def raw_stores(context, duckdb: DuckDBResource):
     return _load_full_csv(context, duckdb, "raw_stores.csv", "raw_stores")
 
 
 @asset(name="raw_supplies", key_prefix=["raw"], group_name="ingestion", compute_kind="duckdb")
-def raw_supplies(context: AssetExecutionContext, duckdb: DuckDBResource):
+def raw_supplies(context, duckdb: DuckDBResource):
     return _load_full_csv(context, duckdb, "raw_supplies.csv", "raw_supplies")
 
 

@@ -1,0 +1,110 @@
+name: jaffle-shop
+
+x-app-env: &app-env
+  JAFFLE_AS_OF: "2026-05-20"
+  DAGSTER_HOME: /dagster_home
+  TZ: America/Sao_Paulo
+
+x-app-security: &app-security
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+services:
+  pipeline:
+    build:
+      context: .
+    image: jaffle-shop/app:0.1.0
+    container_name: jaffle-shop-pipeline
+    command: ["dagster-daemon", "run", "-w", "/app/workspace.yaml"]
+    env_file: .env
+    environment:
+      <<: *app-env
+    volumes:
+      - warehouse:/app/data
+      - elementary:/app/web/public/elementary
+      - dagster_home:/dagster_home
+    <<: *app-security
+    tmpfs:
+      - /tmp:size=256M
+    mem_limit: 1g
+    cpus: 1.0
+    restart: unless-stopped
+
+  pipeline-ui:
+    image: jaffle-shop/app:0.1.0
+    container_name: jaffle-shop-pipeline-ui
+    command: ["dagster-webserver", "--host", "0.0.0.0", "--port", "3000", "-w", "/app/workspace.yaml"]
+    env_file: .env
+    environment:
+      <<: *app-env
+    volumes:
+      - dagster_home:/dagster_home
+    ports:
+      - "3000:3000"
+    <<: *app-security
+    tmpfs:
+      - /tmp:size=128M
+    mem_limit: 512m
+    cpus: 0.5
+    restart: unless-stopped
+
+  api:
+    image: jaffle-shop/app:0.1.0
+    container_name: jaffle-shop-api
+    command: ["uvicorn", "jaffle_api.main:app", "--host", "0.0.0.0", "--port", "8001", "--log-level", "info"]
+    env_file: .env
+    environment:
+      <<: *app-env
+    volumes:
+      - warehouse:/app/data:ro
+    read_only: true
+    <<: *app-security
+    tmpfs:
+      - /tmp:size=64M
+    mem_limit: 256m
+    cpus: 0.5
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; r=urllib.request.urlopen('http://127.0.0.1:8001/api/health', timeout=2); sys.exit(0 if r.status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    image: jaffle-shop/web:0.1.0
+    container_name: jaffle-shop-web
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "8081:80"
+    volumes:
+      - elementary:/usr/share/nginx/html/elementary:ro
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+      - DAC_OVERRIDE
+    tmpfs:
+      - /var/cache/nginx:size=64M
+      - /var/run:size=8M
+      - /tmp:size=16M
+    mem_limit: 128m
+    cpus: 0.25
+    restart: unless-stopped
+
+volumes:
+  warehouse:
+  elementary:
+  dagster_home:

@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from jaffle_api.routes import app as app_routes
+
+_default_origins = "http://localhost:5174,http://127.0.0.1:5174"
+CORS_ORIGINS = [o.strip() for o in os.getenv("CORS_ORIGINS", _default_origins).split(",") if o.strip()]
 
 app = FastAPI(
     title="Jaffle Shop API",
@@ -15,7 +20,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5174", "http://127.0.0.1:5174"],
+    allow_origins=CORS_ORIGINS,
     allow_methods=["GET"],
     allow_headers=["*"],
 )
