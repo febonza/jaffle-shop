@@ -20,3 +20,21 @@ jaffle:
       path: "{{ env_var('JAFFLE_DUCKDB_PATH', '/var/lib/jaffle/jaffle.duckdb') }}"
       schema: analytics
       threads: 4
+
+# Elementary (edr report) looks for a profile named 'elementary' by default.
+# It reads from the elementary schema that dbt-elementary writes during dbt build.
+elementary:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('JAFFLE_DUCKDB_PATH', '../data/jaffle.duckdb') }}"
+      schema: elementary
+      threads: 4
+      extensions:
+        - httpfs
+    prod:
+      type: duckdb
+      path: "{{ env_var('JAFFLE_DUCKDB_PATH', '/var/lib/jaffle/jaffle.duckdb') }}"
+      schema: elementary
+      threads: 4
