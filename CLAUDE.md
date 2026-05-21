@@ -97,6 +97,25 @@ Staging/intermediate models get lighter docs. Don't skip the marts docs — they
 
 Active from day one (`snap_customers`, `snap_products`). Run as part of `dbt build`. Expose SCD-2 attributes via `dim_customers` / `dim_products` (`valid_from`, `valid_to`, `is_current`).
 
+## VPS deployment
+
+The stack is live on Hostinger (VM ID `1633386`, IP `177.7.53.223`, Ubuntu 24.04). Docker Compose project `jaffle-shop` at `/opt/jaffle-shop/compose.yaml`.
+
+| Container | Role |
+|---|---|
+| `jaffle-shop-pipeline` | Dagster daemon |
+| `jaffle-shop-pipeline-ui` | Dagster webserver `127.0.0.1:3000` |
+| `jaffle-shop-pipeline-ui-readonly` | Dagster webserver `127.0.0.1:3001` (public) |
+| `jaffle-shop-api` | FastAPI (internal) |
+| `jaffle-shop-web` | Nginx + React build `0.0.0.0:8081` |
+
+**Accessing the VPS from Claude/Cursor:** The Hostinger MCP has no command executor. Use SSH via the Shell tool:
+```
+ssh -o StrictHostKeyChecking=no root@177.7.53.223 "<command>"
+```
+
+**Known issue — Elementary schema on fresh deploy:** After any container rebuild or DuckDB replacement, `jaffle.elementary.elementary_test_results` and sibling tables won't exist. Elementary writes them only during `dbt build`. Dagster may skip `jaffle_dbt` (already marked materialized in its storage) and run only `elementary_report`, which then fails. Fix: run `dbt build` manually inside the pipeline container, then re-trigger the run.
+
 ## Git remote
 
 Pushes go to **https://github.com/febonza/jaffle-shop** via the **personal** GitHub account. The machine has multiple accounts — verify with `git remote -v` and `gh auth status` before pushing.

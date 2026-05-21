@@ -346,6 +346,141 @@ def stores(
     }
 
 
+@router.get("/data-quality")
+def data_quality(con: duckdb.DuckDBPyConnection = Depends(get_conn)):
+    """Elementary test results summary — powers the /data-quality page."""
+    schema_exists = con.execute("""
+        select count(*) from information_schema.tables
+        where table_schema = 'elementary' and table_name = 'elementary_test_results'
+    """).fetchone()[0]
+    if not schema_exists:
+        return {"available": False}
+
+    inv_row = con.execute(
+        """
+        select i.invocation_id, i.generated_at
+        from elementary.dbt_invocations i
+        where exists (
+            select 1 from elementary.elementary_test_results r
+            where r.invocation_id = i.invocation_id
+        )
+        order by i.generated_at desc
+        limit 1
+        """
+    ).fetchone()
+    if not inv_row:
+        return {"available": False}
+    latest_inv, last_run_ts = inv_row[0], inv_row[1]
+
+    summary = con.execute(
+        """
+        select
+            count(*) as total,
+            sum(case when status = 'pass' then 1 else 0 end) as passed,
+            sum(case when status = 'warn' then 1 else 0 end) as warned,
+            sum(case when status = 'fail' or status = 'error' then 1 else 0 end) as failed
+        from elementary.elementary_test_results
+        where invocation_id = $inv
+        """,
+        {"inv": latest_inv},
+    ).fetchone()
+    total, passed, warned, failed = [int(x) for x in summary]
+
+    table_rows = con.execute(
+        """
+        select
+            table_name,
+            count(*) as tests,
+            sum(case when status = 'pass' then 1 else 0 end) as passed,
+            sum(case when status = 'warn' then 1 else 0 end) as warned,
+            sum(case when status = 'fail' or status = 'error' then 1 else 0 end) as failed
+        from elementary.elementary_test_results
+        where invocation_id = $inv
+          and schema_name = 'analytics'
+        group by table_name
+        order by table_name
+        """,
+        {"inv": latest_inv},
+    ).fetchall()
+
+    tables = []
+    for row in table_rows:
+        tname, t_tests, t_pass, t_warn, t_fail = row
+        t_tests, t_pass, t_warn, t_fail = int(t_tests), int(t_pass), int(t_warn), int(t_fail)
+        if t_fail > 0:
+            score, desc = "red", f"{t_fail} failing"
+        elif t_warn > 0:
+            s = "s" if t_warn > 1 else ""
+            score, desc = "amber", f"{t_warn} warning{s}, {t_pass} passing"
+        else:
+            s = "s" if t_tests != 1 else ""
+            score, desc = "green", f"{t_tests} test{s}, all passing"
+        tables.append({
+            "table": tname,
+            "tests": t_tests,
+            "passed": t_pass,
+            "warned": t_warn,
+            "failed": t_fail,
+            "score": score,
+            "description": desc,
+        })
+
+    failure_rows = con.execute(
+        """
+        select schema_name, table_name, column_name, test_short_name,
+               test_results_description, status, detected_at
+        from elementary.elementary_test_results
+        where invocation_id = $inv
+          and status <> 'pass'
+        order by detected_at desc
+        limit 20
+        """,
+        {"inv": latest_inv},
+    ).fetchall()
+
+    failures = [
+        {
+            "schema": r[0],
+            "table": r[1],
+            "column": r[2],
+            "test": r[3],
+            "description": r[4],
+            "status": r[5],
+            "detected_at": r[6].isoformat() if r[6] else None,
+        }
+        for r in failure_rows
+    ]
+
+    freshness_rows = con.execute(
+        "select unique_id, status, max_loaded_at, max_loaded_at_time_ago_in_s from elementary.dbt_source_freshness_results order by unique_id"
+    ).fetchall()
+
+    freshness = [
+        {
+            "source": r[0].split(".")[-1] if r[0] else "",
+            "status": r[1],
+            "max_loaded_at": r[2],
+            "lag_seconds": float(r[3]) if r[3] is not None else None,
+        }
+        for r in freshness_rows
+    ]
+
+    return {
+        "available": True,
+        "last_run": last_run_ts.isoformat() if hasattr(last_run_ts, "isoformat") else str(last_run_ts),
+        "summary": {
+            "total": total,
+            "passed": passed,
+            "warned": warned,
+            "failed": failed,
+            "pass_rate": round(passed / total * 100, 1) if total else 0.0,
+        },
+        "tables": tables,
+        "failures": failures,
+        "freshness": freshness,
+    }
+
+
 @router.get("/order-size")
 def order_size(
     period: Annotated[str, Query(pattern="^(ytd|mtd|qtd|30d|90d)$")] = "ytd",

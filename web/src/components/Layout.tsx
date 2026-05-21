@@ -6,7 +6,7 @@ const NAV_LINKS = [
   { to: "/", label: "Dashboard", end: true },
   { to: "/ltv", label: "LTV", stub: true },
   { to: "/churn", label: "Churn", stub: true },
-  { to: "/data-quality", label: "Data quality", stub: true },
+  { to: "/data-quality", label: "Data quality" },
 ];
 
 function TopNav() {

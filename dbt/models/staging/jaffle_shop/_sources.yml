@@ -8,7 +8,6 @@ sources:
       (orders, order_items) or loaded in full (dimensions). See the pipeline
       package for the partitioning logic.
     schema: raw
-    loaded_at_field: _loaded_at
     tables:
       - name: raw_customers
         identifier: raw_customers
@@ -25,6 +24,10 @@ sources:
       - name: raw_orders
         identifier: raw_orders
         description: One row per order. The Dagster ingestion asset partitions by `ordered_at::date`.
+        loaded_at_field: ordered_at
+        freshness:
+          warn_after: {count: 25, period: hour}
+          error_after: {count: 49, period: hour}
         columns:
           - name: id
             description: Order UUID. Primary key.
