@@ -16,6 +16,32 @@ from jaffle_pipeline.paths import (
 
 
 @asset(
+    name="elementary_freshness",
+    group_name="observability",
+    deps=[jaffle_dbt],
+    compute_kind="elementary",
+)
+def elementary_freshness(context):
+    """Run `dbt source freshness` and write results into elementary.dbt_source_freshness_results."""
+    cmd = [
+        "dbt",
+        "source",
+        "freshness",
+        "--project-dir",
+        str(DBT_PROJECT_DIR),
+        "--profiles-dir",
+        str(DBT_PROFILES_DIR),
+    ]
+    context.log.info("Running: " + " ".join(cmd))
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        context.log.error(result.stdout)
+        context.log.error(result.stderr)
+        raise RuntimeError(f"dbt source freshness exited {result.returncode}")
+    return MaterializeResult(metadata={})
+
+
+@asset(
     name="elementary_report",
     group_name="observability",
     deps=[jaffle_dbt],
