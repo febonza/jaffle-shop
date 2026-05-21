@@ -51,6 +51,16 @@ function TopNav() {
           <span className="dot" />
           <span>duckdb · prod · v0.4.2</span>
         </div>
+        <a
+          className="about-btn pipelines-btn"
+          href="https://dagster.jaffle.bonzanini.works"
+          target="_blank"
+          rel="noreferrer"
+          onClick={() => setMenuOpen(false)}
+        >
+          <img src="/assets/logos/dagster-mark.svg" alt="" aria-hidden="true" />
+          Dagster pipelines <span aria-hidden="true">→</span>
+        </a>
         <NavLink className="about-btn" to={onAbout ? "/" : "/about"} onClick={() => setMenuOpen(false)}>
           {onAbout ? "Back to dashboard" : "About this dashboard"} <span aria-hidden="true">→</span>
         </NavLink>

@@ -86,6 +86,13 @@ body {
   color: var(--paper);
 }
 .topnav .about-btn span { margin-left: 4px; }
+.topnav .pipelines-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.topnav .pipelines-btn img { width: 14px; height: 14px; display: block; }
+.topnav .pipelines-btn span { margin-left: 0; }
 
 /* ============= Layout ============= */
 .page { padding: 64px 48px 96px; max-width: var(--container); margin: 0 auto; }
