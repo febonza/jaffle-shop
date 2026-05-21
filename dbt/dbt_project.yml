@@ -33,6 +33,8 @@ models:
         +tags: ["finance"]
       customer:
         +tags: ["customer"]
+  elementary:
+    +schema: elementary
 
 seeds:
   jaffle:
