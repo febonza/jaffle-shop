@@ -43,7 +43,25 @@ services:
     volumes:
       - dagster_home:/dagster_home
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
+    <<: *app-security
+    tmpfs:
+      - /tmp:size=128M
+    mem_limit: 512m
+    cpus: 0.5
+    restart: unless-stopped
+
+  pipeline-ui-readonly:
+    image: jaffle-shop/app:0.1.0
+    container_name: jaffle-shop-pipeline-ui-readonly
+    command: ["dagster-webserver", "--read-only", "--host", "0.0.0.0", "--port", "3001", "-w", "/app/workspace.yaml"]
+    env_file: .env
+    environment:
+      <<: *app-env
+    volumes:
+      - dagster_home:/dagster_home
+    ports:
+      - "127.0.0.1:3001:3001"
     <<: *app-security
     tmpfs:
       - /tmp:size=128M
